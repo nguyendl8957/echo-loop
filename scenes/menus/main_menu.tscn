@@ -1,0 +1,117 @@
+[gd_scene format=3 uid="uid://cpx8e7eys1snm"]
+
+[ext_resource type="Script" uid="uid://pkbwa2y41spe" path="res://scripts/core/main_menu.gd" id="1_xqga4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xqga4"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.08235294, 0.36862746, 0.45882353, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.13333334, 0.827451, 0.93333334, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6bivr"]
+bg_color = Color(0.03137255, 0.2, 0.26666668, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2o76q"]
+bg_color = Color(0.05490196, 0.45490196, 0.5647059, 1)
+border_color = Color(0.40392157, 0.9098039, 0.9764706, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ng0o5"]
+bg_color = Color(0.1254902, 0.22352941, 0.3019608, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="MainMenu" type="Control" unique_id=464694366]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xqga4")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1193694790]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0627451, 0.10980392, 0.16862746, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1954019471]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 0.0021497346
+
+[node name="MenuContent" type="VBoxContainer" parent="CenterContainer" unique_id=551683101]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="GameTitle" type="Label" parent="CenterContainer/MenuContent" unique_id=2023477455]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.40392157, 0.9098039, 0.9764706, 1)
+theme_override_font_sizes/font_size = 52
+text = "Echo Loop"
+horizontal_alignment = 1
+
+[node name="NewGameButton" type="Button" parent="CenterContainer/MenuContent" unique_id=1335630519]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_colors/icon_normal_color = Color(0.8784314, 0.98039216, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_xqga4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6bivr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2o76q")
+text = "New Game"
+
+[node name="ContinueButton" type="Button" parent="CenterContainer/MenuContent" unique_id=201707301]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6bivr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2o76q")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ng0o5")
+text = "Continue"
+
+[node name="TutorialButton" type="Button" parent="CenterContainer/MenuContent" unique_id=63504378]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6bivr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2o76q")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ng0o5")
+text = "How to play"
+
+[node name="ExitButton" type="Button" parent="CenterContainer/MenuContent" unique_id=704881190]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_ng0o5")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6bivr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2o76q")
+text = "Exit"

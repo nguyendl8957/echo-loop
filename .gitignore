@@ -1,0 +1,33 @@
+# Godot generated cache (Godot 4.x)
+.godot/
+*.translation
+
+# Build outputs and keys
+/builds/
+/dist/
+*.apk
+*.aab
+*.ipa
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+
+# Local secrets / environment
+.env
+.env.*
+!.env.example
+*credentials*
+
+# OS and IDE artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Notes: Keep project.godot, .tscn, .gd, image assets and *.uid files.
+# For Godot 4.1+, export_presets.cfg is normally shareable IF manually
+# reviewed to ensure it contains no secrets. For this first commit
+# exclude it until the team decides its sanitized export policy.
+export_presets.cfg

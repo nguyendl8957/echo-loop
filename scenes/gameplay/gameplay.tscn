@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://ba4plnwjd4h7t"]
+
+[ext_resource type="Script" uid="uid://bwdcax50h0a2r" path="res://scripts/core/gameplay.gd" id="1_elxb5"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_elxb5"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.1254902, 0.22352941, 0.3019608, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.13333334, 0.827451, 0.93333334, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6bivr"]
+bg_color = Color(0.03137255, 0.2, 0.26666668, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2o76q"]
+bg_color = Color(0.05490196, 0.45490196, 0.5647059, 1)
+border_color = Color(0.40392157, 0.9098039, 0.9764706, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="Gameplay" type="Node2D" unique_id=1452477168]
+script = ExtResource("1_elxb5")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=254047554]
+
+[node name="HUDRoot" type="Control" parent="HUD" unique_id=1658827081]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="HUD/HUDRoot" unique_id=76273517]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0627451, 0.10980392, 0.16862746, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="HUD/HUDRoot" unique_id=78838431]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameContent" type="VBoxContainer" parent="HUD/HUDRoot/CenterContainer" unique_id=687037404]
+layout_mode = 2
+
+[node name="GameLabel" type="Label" parent="HUD/HUDRoot/CenterContainer/GameContent" unique_id=364175735]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.40392157, 0.9098039, 0.9764706, 1)
+theme_override_font_sizes/font_size = 40
+text = "ECHO LOOP - GAMEPLAY TEST"
+horizontal_alignment = 1
+
+[node name="BackButton" type="Button" parent="HUD/HUDRoot/CenterContainer/GameContent" unique_id=386851851]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_elxb5")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6bivr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2o76q")
+text = "BACK TO MENU"
