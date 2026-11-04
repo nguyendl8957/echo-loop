@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://cchgo76cmg7j6"]
+
+[ext_resource type="Texture2D" uid="uid://x3n8xyj1rsg1" path="res://icon.svg" id="1_8afob"]
+[ext_resource type="Script" uid="uid://b63ft3yc4n7xt" path="res://scripts/player/player_controller.gd" id="1_dovo2"]
+
+[node name="Player" type="Node2D" unique_id=1364354151]
+script = ExtResource("1_dovo2")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2027104558]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("1_8afob")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=111335320]
