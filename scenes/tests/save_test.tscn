@@ -1,0 +1,196 @@
+[gd_scene format=3 uid="uid://86yvyb2aghnx"]
+
+[sub_resource type="GDScript" id="GDScript_5ye3o"]
+script/source = "
+extends Control
+
+# Nạp hai module quản lý
+const SaveManagerScript = preload(\"res://scripts/data/save_manager.gd\")
+const AudioManagerScript = preload(\"res://scripts/data/audio_manager.gd\")
+
+# Âm thanh giao diện
+const CLICK_SOUND: AudioStream = preload(
+    \"res://assets/audio/click_sound.mp3\"
+)
+
+# Các node giao diện hiện có
+@onready var save_level_2_button: Button = $MarginContainer/Content/SaveLevel2Button
+@onready var load_progress_button: Button = $MarginContainer/Content/LoadProgressButton
+@onready var sound_off_button: Button = $MarginContainer/Content/SoundOffButton
+@onready var sound_on_button: Button = $MarginContainer/Content/SoundOnButton
+@onready var reset_button: Button = $MarginContainer/Content/ResetProgressButton
+@onready var status_label: Label = $MarginContainer/Content/StatusLabel
+
+# Khởi tạo các modules
+var save_manager = SaveManagerScript.new()
+var audio_manager
+
+
+# ---------------- Khởi tạo ----------------
+
+func _ready() -> void:
+	# Tạo AudioManager
+	audio_manager = AudioManagerScript.new()
+	add_child(audio_manager)
+
+	# Kết nối các nút
+	save_level_2_button.pressed.connect(_on_save_level_2)
+	load_progress_button.pressed.connect(_on_load_progress)
+	sound_off_button.pressed.connect(_on_sound_off)
+	sound_on_button.pressed.connect(_on_sound_on)
+	reset_button.pressed.connect(_on_reset)
+
+	# Đọc dữ liệu đã lưu
+	var data: Dictionary = save_manager.load_progress()
+
+	# Khôi phục trạng thái âm thanh
+	audio_manager.set_sound_enabled(data[\"sound_enabled\"])
+
+	# Cập nhật giao diện, không phát tiếng khi khởi động
+	_update_status(data)
+
+
+# ---------------- Lưu tiến trình ----------------
+
+func _on_save_level_2() -> void:
+	var data: Dictionary = save_manager.load_progress()
+
+	# Lưu tiến trình Level 2
+	data[\"unlocked_level\"] = 2
+
+	if save_manager.save_progress(data):
+		status_label.text = \"Đã lưu Level 2!\"
+		audio_manager.play_sound(CLICK_SOUND)
+	else:
+		status_label.text = \"Lưu thất bại!\"
+
+
+# ---------------- Đọc tiến trình ----------------
+
+func _on_load_progress() -> void:
+	var data: Dictionary = save_manager.load_progress()
+
+	# Khôi phục trạng thái âm thanh
+	audio_manager.set_sound_enabled(data[\"sound_enabled\"])
+
+	# Hiển thị dữ liệu
+	_update_status(data)
+
+	# Phát tiếng khi người dùng nhấn Load
+	audio_manager.play_sound(CLICK_SOUND)
+
+
+# ---------------- Bật / Tắt âm thanh ----------------
+
+func _on_sound_off() -> void:
+	var data: Dictionary = save_manager.load_progress()
+
+	data[\"sound_enabled\"] = false
+
+	if save_manager.save_progress(data):
+		audio_manager.set_sound_enabled(false)
+		status_label.text = \"Sound: OFF\"
+	else:
+		status_label.text = \"Không thể lưu trạng thái âm thanh!\"
+
+
+func _on_sound_on() -> void:
+	var data: Dictionary = save_manager.load_progress()
+
+	data[\"sound_enabled\"] = true
+
+	if save_manager.save_progress(data):
+		audio_manager.set_sound_enabled(true)
+		status_label.text = \"Sound: ON\"
+		audio_manager.play_sound(CLICK_SOUND)
+	else:
+		status_label.text = \"Không thể lưu trạng thái âm thanh!\"
+
+
+# ---------------- Đặt lại tiến trình ----------------
+
+func _on_reset() -> void:
+	var default_data = {
+		\"unlocked_level\": 1,
+		\"sound_enabled\": true
+	}
+
+	if save_manager.save_progress(default_data):
+		audio_manager.set_sound_enabled(true)
+		status_label.text = \"Đã đặt lại tiến trình!\"
+	else:
+		status_label.text = \"Reset thất bại!\"
+
+
+# ---------------- Cập nhật giao diện ----------------
+
+func _update_status(data: Dictionary) -> void:
+	status_label.text = \"Level: %d | Sound: %s\" % [
+		data[\"unlocked_level\"],
+		data[\"sound_enabled\"]
+	]
+"
+
+[node name="SaveTest" type="Control" unique_id=555717737]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_5ye3o")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1844501544]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0627451, 0.10980392, 0.16862746, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=36720263]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 16
+
+[node name="Content" type="VBoxContainer" parent="MarginContainer" unique_id=787323662]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/Content" unique_id=2087396595]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.40392157, 0.9098039, 0.9764706, 1)
+theme_override_font_sizes/font_size = 24
+text = "ECHO LOOP - SAVE / AUDIO TEST (TV5)"
+
+[node name="SaveLevel2Button" type="Button" parent="MarginContainer/Content" unique_id=830809763]
+layout_mode = 2
+text = "Save Level 2"
+
+[node name="LoadProgressButton" type="Button" parent="MarginContainer/Content" unique_id=230940300]
+layout_mode = 2
+text = "Load Progress"
+
+[node name="SoundOffButton" type="Button" parent="MarginContainer/Content" unique_id=1667112052]
+layout_mode = 2
+text = "Turn Sound Off"
+
+[node name="SoundOnButton" type="Button" parent="MarginContainer/Content" unique_id=1310813196]
+layout_mode = 2
+text = "Turn Sound On"
+
+[node name="ResetProgressButton" type="Button" parent="MarginContainer/Content" unique_id=357255077]
+layout_mode = 2
+text = "Reset Progress"
+
+[node name="StatusLabel" type="Label" parent="MarginContainer/Content" unique_id=939554465]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.40392157, 0.9098039, 0.9764706, 1)
