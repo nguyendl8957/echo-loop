@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/tests/puzzle_test.gd" id="1_test"]
+
+[node name="PuzzleTest" type="Node2D"]
+script = ExtResource("1_test")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="StatusLabel" type="Label" parent="CanvasLayer"]
+offset_left = 32.0
+offset_top = 24.0
+offset_right = 500.0
+offset_bottom = 70.0
+theme_override_font_sizes/font_size = 24
+text = "Running Puzzle Tests..."
