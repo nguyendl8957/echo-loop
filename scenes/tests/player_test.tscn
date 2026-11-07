@@ -1,0 +1,105 @@
+[gd_scene format=3 uid="uid://caqccbqxd3lgs"]
+
+[ext_resource type="PackedScene" uid="uid://cchgo76cmg7j6" path="res://scenes/player/player.tscn" id="1_bbpst"]
+
+[sub_resource type="GDScript" id="GDScript_1snfn"]
+script/source = "extends Node2D
+
+const CELL_SIZE: int = 48
+const MAP_SIZE: Vector2i = Vector2i(9, 7)
+const START_CELL: Vector2i = Vector2i(1, 1)
+
+@onready var player: PlayerController = $Player
+
+var blocked_cells: Array[Vector2i] = []
+
+
+func _ready() -> void:
+	# Tuong bao tren va duoi.
+	for x in range(MAP_SIZE.x):
+		blocked_cells.append(Vector2i(x, 0))
+		blocked_cells.append(Vector2i(x, MAP_SIZE.y - 1))
+
+	# Tuong bao trai va phai.
+	for y in range(1, MAP_SIZE.y - 1):
+		blocked_cells.append(Vector2i(0, y))
+		blocked_cells.append(Vector2i(MAP_SIZE.x - 1, y))
+
+	# Hai o tuong ben trong.
+	blocked_cells.append(Vector2i(2, 1))
+	blocked_cells.append(Vector2i(2, 2))
+
+	player.reset_position(START_CELL)
+	queue_redraw()
+
+	print(\"Mui ten: di chuyen | Space: WAIT | R: reset\")
+	print(\"Vi tri bat dau: \", player.grid_position)
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not event is InputEventKey:
+		return
+
+	if not event.pressed or event.echo:
+		return
+
+	var action: String = \"\"
+
+	match event.keycode:
+		KEY_UP:
+			action = \"UP\"
+		KEY_DOWN:
+			action = \"DOWN\"
+		KEY_LEFT:
+			action = \"LEFT\"
+		KEY_RIGHT:
+			action = \"RIGHT\"
+		KEY_SPACE:
+			action = \"WAIT\"
+		KEY_R:
+			player.reset_position(START_CELL)
+			print(\"RESET | cell=\", player.grid_position)
+			get_viewport().set_input_as_handled()
+			return
+		_:
+			return
+
+	var moved: bool = player.apply_action(action, blocked_cells)
+
+	print(
+		action,
+		\" | moved=\", moved,
+		\" | cell=\", player.grid_position
+	)
+
+	get_viewport().set_input_as_handled()
+
+
+func _draw() -> void:
+	for y in range(MAP_SIZE.y):
+		for x in range(MAP_SIZE.x):
+			var cell := Vector2i(x, y)
+
+			var cell_rect := Rect2(
+				Vector2(cell) * CELL_SIZE,
+				Vector2.ONE * CELL_SIZE
+			)
+
+			var color := Color(\"#182332\")
+
+			if blocked_cells.has(cell):
+				color = Color(\"#52647a\")
+
+			draw_rect(cell_rect, color)
+			draw_rect(
+				cell_rect,
+				Color(\"#8495a7\"),
+				false,
+				1.0
+			)
+"
+
+[node name="PlayerTest" type="Node2D" unique_id=1826137671]
+script = SubResource("GDScript_1snfn")
+
+[node name="Player" parent="." unique_id=1364354151 instance=ExtResource("1_bbpst")]
