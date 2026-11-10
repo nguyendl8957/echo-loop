@@ -1,0 +1,256 @@
+[gd_scene format=3]
+
+[sub_resource type="GDScript" id="GDScript_save_integration"]
+script/source = "extends Control
+
+const SaveManagerScript = preload(\"res://scripts/data/save_manager.gd\")
+const SAVE_PATH: String = \"user://progress.json\"
+const DEFAULT_DATA: Dictionary = {
+	\"unlocked_level\": 1,
+	\"sound_enabled\": true
+}
+
+@onready var run_button: Button = $Margin/Content/RunButton
+@onready var status_label: Label = $Margin/Content/StatusLabel
+@onready var output: TextEdit = $Margin/Content/Output
+@onready var confirm_dialog: ConfirmationDialog = $RunConfirmation
+
+var save_manager = SaveManagerScript.new()
+var passed: int = 0
+var failed: int = 0
+
+
+func _ready() -> void:
+	run_button.pressed.connect(_on_run_pressed)
+	confirm_dialog.confirmed.connect(_run_tests)
+	status_label.text = \"Chưa chạy. Test sẽ tạm thay đổi user://progress.json rồi khôi phục bản cũ.\"
+	output.text = \"Nhấn Run Save Tests để bắt đầu. Không đánh dấu PASS trước khi thấy kết quả thực tế.\"
+
+
+func _on_run_pressed() -> void:
+	confirm_dialog.popup_centered()
+
+
+func _run_tests() -> void:
+	run_button.disabled = true
+	passed = 0
+	failed = 0
+	output.clear()
+
+	# Sao lưu nguyên văn file save của người dùng để khôi phục sau test.
+	var original_exists: bool = FileAccess.file_exists(SAVE_PATH)
+	var original_content: String = \"\"
+	if original_exists:
+		var original_file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+		if original_file == null:
+			_log(\"BLOCKED: Không đọc được file save hiện tại; dừng test để tránh mất dữ liệu.\")
+			run_button.disabled = false
+			return
+		original_content = original_file.get_as_text()
+		original_file.close()
+
+	_log(\"=== SAVE MANAGER INTEGRATION TEST ===\")
+	_log(\"API: SaveManager.new(), load_progress(), save_progress(), reset_progress()\")
+	_log(\"Lưu ý: file save sẽ được khôi phục sau khi test.\")
+
+	# Case 1: mặc định khi không có file.
+	var reset_ok: bool = save_manager.reset_progress()
+	_check(reset_ok, \"Chuẩn bị: xóa file save cũ để kiểm tra mặc định\")
+	var default_data: Dictionary = save_manager.load_progress()
+	_check(
+		default_data == DEFAULT_DATA,
+		\"SAVE-01: không có file -> Level 1, sound ON\"
+	)
+
+	# Case 2: lưu và đọc lại.
+	var valid_data: Dictionary = {
+		\"unlocked_level\": 2,
+		\"sound_enabled\": false
+	}
+	# Cố ý truyền thêm dữ liệu test để xác nhận SaveManager chỉ giữ hai khóa được phép.
+	var input_data: Dictionary = {
+		\"unlocked_level\": 2,
+		\"sound_enabled\": false,
+		\"test_tick\": 5,
+		\"echo_history\": [\"RIGHT\", \"WAIT\"]
+	}
+	var save_ok: bool = save_manager.save_progress(input_data)
+	_check(save_ok, \"SAVE-02: save_progress() ghi dữ liệu hợp lệ\")
+	var loaded_data: Dictionary = save_manager.load_progress()
+	_check(
+		loaded_data == valid_data,
+		\"SAVE-02: load_progress() chỉ trả Level 2, sound OFF\"
+	)
+
+	# Case 3: file JSON chỉ có đúng hai khóa được phép.
+	var raw_json: String = _read_save_file()
+	var parser := JSON.new()
+	var parse_ok: bool = parser.parse(raw_json) == OK
+	var has_only_two_keys: bool = false
+	if parse_ok and typeof(parser.data) == TYPE_DICTIONARY:
+		var stored: Dictionary = parser.data
+		has_only_two_keys = (
+			stored.size() == 2
+			and stored.has(\"unlocked_level\")
+			and stored.has(\"sound_enabled\")
+		)
+	_check(
+		has_only_two_keys,
+		\"SAVE-03: JSON chỉ chứa unlocked_level và sound_enabled\"
+	)
+
+	# Case 4: dữ liệu sai không được ghi đè file hợp lệ trước đó.
+	var invalid_saved: bool = save_manager.save_progress({
+		\"unlocked_level\": 0,
+		\"sound_enabled\": false
+	})
+	var after_invalid: Dictionary = save_manager.load_progress()
+	_check(
+		not invalid_saved and after_invalid == valid_data,
+		\"SAVE-04: từ chối dữ liệu không hợp lệ, giữ save cũ\"
+	)
+
+	# Case 5: JSON hỏng phải fallback về mặc định.
+	var corrupt_written: bool = _write_save_file(\"{ JSON BROKEN \")
+	var fallback_data: Dictionary = save_manager.load_progress()
+	_check(
+		corrupt_written and fallback_data == DEFAULT_DATA,
+		\"SAVE-05: JSON hỏng -> fallback mặc định, không crash\"
+	)
+
+	# Case 6: reset_progress xóa file.
+	var reset_result: bool = save_manager.reset_progress()
+	_check(
+		reset_result and not FileAccess.file_exists(SAVE_PATH),
+		\"SAVE-06: reset_progress() xóa file save\"
+	)
+	_check(
+		save_manager.load_progress() == DEFAULT_DATA,
+		\"SAVE-06: sau reset, load_progress() trả mặc định\"
+	)
+
+	# Khôi phục save nguyên bản, không để dữ liệu test thay thế tiến trình thật.
+	var restored: bool = _restore_original_save(original_exists, original_content)
+	_check(restored, \"CLEANUP: khôi phục dữ liệu save trước khi test\")
+
+	_log(\"--------------------------------\")
+	_log(\"PASSED: %d | FAILED: %d\" % [passed, failed])
+	if failed == 0:
+		_log(\"RESULT: ALL TESTS PASSED (F6 scene only)\")
+		status_label.text = \"F6 SaveManager: %d PASS, %d FAIL\" % [passed, failed]
+	else:
+		_log(\"RESULT: FAILED - xem các dòng FAIL phía trên\")
+		status_label.text = \"F6 SaveManager: %d PASS, %d FAIL\" % [passed, failed]
+
+	run_button.disabled = false
+
+
+func _check(condition: bool, description: String) -> void:
+	if condition:
+		passed += 1
+		_log(\"PASS: \" + description)
+	else:
+		failed += 1
+		_log(\"FAIL: \" + description)
+		push_error(\"FAIL: \" + description)
+
+
+func _read_save_file() -> String:
+	if not FileAccess.file_exists(SAVE_PATH):
+		return \"\"
+	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if file == null:
+		return \"\"
+	var content: String = file.get_as_text()
+	file.close()
+	return content
+
+
+func _write_save_file(content: String) -> bool:
+	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if file == null:
+		return false
+	file.store_string(content)
+	file.flush()
+	var result: bool = file.get_error() == OK
+	file.close()
+	return result
+
+
+func _restore_original_save(original_exists: bool, original_content: String) -> bool:
+	if original_exists:
+		return _write_save_file(original_content)
+	return save_manager.reset_progress()
+
+
+func _log(message: String) -> void:
+	output.text += message + \"\\n\"
+	output.scroll_vertical = output.get_line_count()
+	print(message)
+"
+
+[node name="SaveIntegrationTest" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_save_integration")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.055, 0.09, 0.14, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="Content" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.4, 0.9, 0.97, 1)
+text = "ECHO LOOP - SAVE MANAGER INTEGRATION TEST"
+
+[node name="Description" type="Label" parent="Margin/Content"]
+layout_mode = 2
+autowrap_mode = 3
+text = "F6 only. Test checks defaults, save/load, two allowed keys, invalid data, corrupt JSON fallback and reset. Existing user://progress.json is backed up and restored after the run."
+
+[node name="RunButton" type="Button" parent="Margin/Content"]
+layout_mode = 2
+text = "Run Save Tests"
+
+[node name="StatusLabel" type="Label" parent="Margin/Content"]
+layout_mode = 2
+autowrap_mode = 3
+text = "Chưa chạy"
+
+[node name="Output" type="TextEdit" parent="Margin/Content"]
+custom_minimum_size = Vector2(0, 360)
+size_flags_vertical = 3
+layout_mode = 2
+editable = false
+text = "Test output sẽ xuất hiện tại đây."
+
+[node name="RunConfirmation" type="ConfirmationDialog" parent="."]
+title = "Xác nhận chạy test SaveManager"
+dialog_text = "Test sẽ tạm thay đổi user://progress.json và cố gắng khôi phục nội dung cũ sau khi chạy. Hãy đóng game đang dùng file save này trước khi tiếp tục."
+ok_button_text = "Chạy test"
