@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://bijfmmo8jp4h1"]
+
+[ext_resource type="Script" uid="uid://c2wwt8bq8uh5n" path="res://tests/hud_integration_test.gd" id="1_hc3xe"]
+[ext_resource type="PackedScene" uid="uid://bopc2s1tttpqo" path="res://scenes/ui/hud.tscn" id="1_s107a"]
+
+[node name="HUDIntegrationTest" type="Node" unique_id=627971356]
+script = ExtResource("1_hc3xe")
+
+[node name="HUD" parent="." unique_id=985695084 instance=ExtResource("1_s107a")]
