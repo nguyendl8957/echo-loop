@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://cqs5152k872tb"]
+
+[ext_resource type="Script" uid="uid://clvp42rln61k8" path="res://scripts/player/echo_controller.gd" id="1_6omou"]
+[ext_resource type="Texture2D" uid="uid://x3n8xyj1rsg1" path="res://icon.svg" id="2_eybtx"]
+
+[node name="Echo" type="Node2D" unique_id=98339172]
+script = ExtResource("1_6omou")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=960964783]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("2_eybtx")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1404777727]

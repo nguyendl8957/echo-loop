@@ -1,0 +1,118 @@
+[gd_scene format=3 uid="uid://buff7dnhlh67k"]
+
+[ext_resource type="PackedScene" uid="uid://cqs5152k872tb" path="res://scenes/player/echo.tscn" id="1_f5itj"]
+
+[sub_resource type="GDScript" id="GDScript_esean"]
+script/source = "extends Node2D
+
+const START := Vector2i(1, 1)
+const ECHO_SCENE := preload(\"res://scenes/player/echo.tscn\")
+const PLAYER_SCENE := preload(\"res://scenes/player/player.tscn\")
+
+@onready var echo: EchoController = $Echo
+
+var _passed := 0
+var _failed := 0
+
+
+func _ready() -> void:
+	var cyan := Color(0.4, 1.0, 1.0, 0.75)
+	var pink := Color(1.0, 0.5, 0.8, 0.75)
+	var wall: Array[Vector2i] = [Vector2i(2, 1)]
+	var no_walls: Array[Vector2i] = []
+
+	var history := PackedStringArray([
+		\"RIGHT\", \"DOWN\", \"RIGHT\", \"WAIT\",
+		\"RIGHT\", \"DOWN\", \"LEFT\", \"UP\",
+		\"LEFT\", \"DOWN\", \"RIGHT\", \"UP\"
+	])
+	var expected_cells: Array[Vector2i] = [
+		Vector2i(1, 1), Vector2i(1, 2), Vector2i(2, 2), Vector2i(2, 2),
+		Vector2i(3, 2), Vector2i(3, 3), Vector2i(2, 3), Vector2i(2, 2),
+		Vector2i(1, 2), Vector2i(1, 3), Vector2i(2, 3), Vector2i(2, 2)
+	]
+	var expected_moves: Array[bool] = [
+		false, true, true, false, true, true,
+		true, true, true, true, true, true
+	]
+
+	echo.setup_echo(START, history, cyan)
+	for tick in range(12):
+		var moved := echo.apply_echo_action(tick, wall)
+		_check(
+			moved == expected_moves[tick]
+			and echo.grid_position == expected_cells[tick],
+			\"Tick %d %s: cell=%s (expected %s), moved=%s (expected %s)\" % [
+				tick, history[tick], echo.grid_position, expected_cells[tick],
+				moved, expected_moves[tick]
+			]
+		)
+
+	echo.setup_echo(START, PackedStringArray([\"RIGHT\"]), cyan)
+	_check(
+		echo.grid_position == START and echo.position == Vector2(72, 72),
+		\"Reset returns to start and cell center\"
+	)
+
+	var first_move := echo.apply_echo_action(0, no_walls)
+	_check(
+		first_move and echo.grid_position == Vector2i(2, 1),
+		\"Short history: first action moves\"
+	)
+
+	var missing_move := echo.apply_echo_action(1, no_walls)
+	_check(
+		not missing_move and echo.grid_position == Vector2i(2, 1),
+		\"Missing history acts like WAIT\"
+	)
+
+	var other_echo := ECHO_SCENE.instantiate() as EchoController
+	add_child(other_echo)
+	other_echo.setup_echo(START, PackedStringArray(), pink)
+
+	var player := PLAYER_SCENE.instantiate() as PlayerController
+	add_child(player)
+	player.reset_position(START)
+
+	echo.setup_echo(Vector2i(2, 1), PackedStringArray([\"LEFT\"]), cyan)
+	var moved_into_shared_cell := echo.apply_echo_action(0, no_walls)
+	_check(
+		moved_into_shared_cell
+		and echo.grid_position == player.grid_position
+		and echo.grid_position == other_echo.grid_position,
+		\"Echo can move into a cell occupied by Player and another Echo\"
+	)
+
+	var echo_sprite := echo.get_node(\"Sprite2D\") as Sprite2D
+	var other_sprite := other_echo.get_node(\"Sprite2D\") as Sprite2D
+	_check(
+		echo_sprite.self_modulate.is_equal_approx(cyan)
+		and other_sprite.self_modulate.is_equal_approx(pink),
+		\"Each Echo uses its own tint\"
+	)
+
+	# Separate the Echoes so both colors are visible after the test.
+	other_echo.setup_echo(Vector2i(3, 1), PackedStringArray(), pink)
+	player.queue_free()
+
+	var summary := \"Echo Test   PASS: %d | FAIL: %d\" % [_passed, _failed]
+	var label := Label.new()
+	label.position = Vector2(16, 208)
+	label.text = summary
+	add_child(label)
+	print(summary)
+
+
+func _check(condition: bool, description: String) -> void:
+	if condition:
+		_passed += 1
+		print(\"PASS \", description)
+	else:
+		_failed += 1
+		push_error(\"FAIL \" + description)
+"
+
+[node name="EchoTest" type="Node2D" unique_id=261249388]
+script = SubResource("GDScript_esean")
+
+[node name="Echo" parent="." unique_id=98339172 instance=ExtResource("1_f5itj")]
