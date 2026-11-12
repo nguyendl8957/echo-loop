@@ -14,6 +14,9 @@ signal input_rejected(action: String)
 
 var time_loop: TimeLoopManager
 var input_locked: bool = false
+## True: Time Loop đầy đủ (giữ hành vi Sprint 01).
+## False: demo Sprint 02, dừng sau 12 tick và không tạo Echo.
+var auto_advance_loops: bool = true
 
 
 func setup(loop_manager: TimeLoopManager) -> void:
@@ -48,13 +51,20 @@ func submit_player_action(action: String) -> void:
 		echo_actions
 	)
 
+	
 	tick_finished.emit(tick_number)
 
-	if tick_number >= time_loop.MAX_TICKS:
-		end_current_loop()
+	if tick_number >= TimeLoopManager.MAX_TICKS:
+		if auto_advance_loops:
+			end_current_loop()
+		else:
+			input_locked = true
 
 
 func end_current_loop() -> void:
+	if not auto_advance_loops:
+		return
+
 	if input_locked or time_loop == null:
 		return
 

@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://ba4plnwjd4h7t"]
 
 [ext_resource type="Script" uid="uid://bwdcax50h0a2r" path="res://scripts/core/gameplay.gd" id="1_elxb5"]
+[ext_resource type="PackedScene" uid="uid://cchgo76cmg7j6" path="res://scenes/player/player.tscn" id="2_x0t60"]
+[ext_resource type="PackedScene" uid="uid://bopc2s1tttpqo" path="res://scenes/ui/hud.tscn" id="3_2p25t"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_elxb5"]
 content_margin_left = 16.0
@@ -36,9 +38,10 @@ corner_radius_bottom_left = 12
 [node name="Gameplay" type="Node2D" unique_id=1452477168]
 script = ExtResource("1_elxb5")
 
-[node name="HUD" type="CanvasLayer" parent="." unique_id=254047554]
+[node name="LegacyHUD" type="CanvasLayer" parent="." unique_id=254047554]
+visible = false
 
-[node name="HUDRoot" type="Control" parent="HUD" unique_id=1658827081]
+[node name="HUDRoot" type="Control" parent="LegacyHUD" unique_id=1658827081]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -46,7 +49,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Background" type="ColorRect" parent="HUD/HUDRoot" unique_id=76273517]
+[node name="Background" type="ColorRect" parent="LegacyHUD/HUDRoot" unique_id=76273517]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -55,7 +58,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0627451, 0.10980392, 0.16862746, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="HUD/HUDRoot" unique_id=78838431]
+[node name="CenterContainer" type="CenterContainer" parent="LegacyHUD/HUDRoot" unique_id=78838431]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -63,19 +66,33 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="GameContent" type="VBoxContainer" parent="HUD/HUDRoot/CenterContainer" unique_id=687037404]
+[node name="GameContent" type="VBoxContainer" parent="LegacyHUD/HUDRoot/CenterContainer" unique_id=687037404]
 layout_mode = 2
 
-[node name="GameLabel" type="Label" parent="HUD/HUDRoot/CenterContainer/GameContent" unique_id=364175735]
+[node name="GameLabel" type="Label" parent="LegacyHUD/HUDRoot/CenterContainer/GameContent" unique_id=364175735]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.40392157, 0.9098039, 0.9764706, 1)
 theme_override_font_sizes/font_size = 40
 text = "ECHO LOOP - GAMEPLAY TEST"
 horizontal_alignment = 1
 
-[node name="BackButton" type="Button" parent="HUD/HUDRoot/CenterContainer/GameContent" unique_id=386851851]
+[node name="BackButton" type="Button" parent="LegacyHUD/HUDRoot/CenterContainer/GameContent" unique_id=386851851]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_elxb5")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_6bivr")
 theme_override_styles/hover = SubResource("StyleBoxFlat_2o76q")
 text = "BACK TO MENU"
+
+[node name="LevelRoot" type="Node2D" parent="." unique_id=521491810]
+position = Vector2(400, 200)
+
+[node name="Walls" type="Node2D" parent="LevelRoot" unique_id=880862172]
+
+[node name="InteractiveObjects" type="Node2D" parent="LevelRoot" unique_id=373563781]
+
+[node name="Player" parent="LevelRoot" unique_id=1364354151 instance=ExtResource("2_x0t60")]
+
+[node name="GameCamera" type="Camera2D" parent="." unique_id=1657914101]
+position = Vector2(640, 360)
+
+[node name="HUD" parent="." unique_id=985695084 instance=ExtResource("3_2p25t")]

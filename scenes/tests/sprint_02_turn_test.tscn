@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bsg6d77bx4qb"]
+
+[ext_resource type="Script" uid="uid://clkbfmkeihvvy" path="res://tests/sprint02_turn_test.gd" id="1_d1d5p"]
+
+[node name="Sprint02TurnTest" type="Node" unique_id=1259674793]
+script = ExtResource("1_d1d5p")
