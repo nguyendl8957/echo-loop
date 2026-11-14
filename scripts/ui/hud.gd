@@ -16,6 +16,7 @@ signal restart_requested
 @onready var level_label: Label = $HUDRoot/TopBar/LevelLabel
 @onready var tick_label: Label = $HUDRoot/TopBar/TickLabel
 @onready var echo_label: Label = $HUDRoot/TopBar/EchoLabel
+@onready var loop_label: Label = $HUDRoot/TopBar/LoopLabel
 
 
 func _ready() -> void:
@@ -53,3 +54,16 @@ func update_hud(
 	level_label.text = "LEVEL %02d" % level
 	tick_label.text = "TICK: %d/%d" % [tick, max_tick]
 	echo_label.text = "ECHO: %d" % echo_count
+	
+func update_loop_status(loop_number: int, echo_count: int, is_finished: bool) -> void:
+	loop_label.text = "LOOP: %d" % loop_number
+	echo_label.text = "ECHO: %d" % echo_count
+	set_input_locked(is_finished)
+
+
+func set_input_locked(locked: bool) -> void:
+	up_button.disabled = locked
+	down_button.disabled = locked
+	left_button.disabled = locked
+	right_button.disabled = locked
+	wait_button.disabled = locked
