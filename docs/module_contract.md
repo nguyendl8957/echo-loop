@@ -245,3 +245,18 @@ Các thay đổi trên file dùng chung cần được Leader thống nhất tr�
 **Ghi chú kiểm thử:** Level 01 trong PR #34 hiện chưa chứa switch và door. Vì vậy kiểm thử cửa/công tắc cần fixture độc lập hoặc dữ liệu Level 01 được TV3 điều chỉnh theo yêu cầu nghiệm thu. Không được coi riêng đường giải Level 01 là bằng chứng đã kiểm tra logic cửa.
 
 **Trạng thái nghiệm thu:** Chưa xác nhận PASS. Chỉ cập nhật sau khi Leader kiểm thử trên code và commit thực tế.
+
+### HUD Sprint 03 — Approved API
+
+- `update_hud(level, tick, max_tick, echo_count)`:
+  Cập nhật Level, Tick và số Echo theo định dạng x/2.
+- `update_loop_status(loop_number, echo_count, is_finished)`:
+  Cập nhật vòng hiện tại, số Echo và trạng thái khóa input.
+- `set_input_locked(locked)`:
+  Khóa/mở D-pad, WAIT và End Loop.
+  Restart vẫn được phép sử dụng.
+
+Core quyết định khi nào khóa hoặc mở input.
+`is_finished = true` nghĩa là Gameplay tạm thời hoặc
+vĩnh viễn không nhận action, không phải tự động báo thắng.
+Sau khi chuyển sang vòng mới, Core phải mở khóa input.

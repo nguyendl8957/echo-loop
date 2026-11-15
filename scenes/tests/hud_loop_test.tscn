@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://dyvs7tuksrnbe"]
+
+[ext_resource type="PackedScene" uid="uid://bopc2s1tttpqo" path="res://scenes/ui/hud.tscn" id="1_7wqyg"]
+[ext_resource type="Script" uid="uid://ce0mimgfrvcvi" path="res://tests/hud_loop_test.gd" id="1_yuw38"]
+
+[node name="HUDLoopTest" type="Node" unique_id=1469791719]
+script = ExtResource("1_yuw38")
+
+[node name="HUD" parent="." unique_id=985695084 instance=ExtResource("1_7wqyg")]
+
+[editable path="HUD"]

@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/tests/puzzle_tick_test.gd" id="1_test"]
+[ext_resource type="PackedScene" path="res://scenes/puzzle/pressure_switch.tscn" id="2_switch"]
+[ext_resource type="PackedScene" path="res://scenes/puzzle/door.tscn" id="3_door"]
+
+[node name="PuzzleTickTest" type="Node2D"]
+script = ExtResource("1_test")
+
+[node name="PuzzleFixture" type="Node2D" parent="."]
+
+[node name="SwitchA" parent="PuzzleFixture" instance=ExtResource("2_switch")]
+
+[node name="SwitchB" parent="PuzzleFixture" instance=ExtResource("2_switch")]
+
+[node name="Door" parent="PuzzleFixture" instance=ExtResource("3_door")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="StatusLabel" type="Label" parent="CanvasLayer"]
+offset_left = 32.0
+offset_top = 24.0
+offset_right = 600.0
+offset_bottom = 70.0
+theme_override_font_sizes/font_size = 24
+text = "Running Puzzle Tick Snapshot Tests..."

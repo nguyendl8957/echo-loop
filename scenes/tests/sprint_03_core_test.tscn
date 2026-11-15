@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://4ey0x1xoxp2k"]
+
+[ext_resource type="Script" uid="uid://dpapuhp8llbg" path="res://tests/sprint_03_core_test.gd" id="1_afm5x"]
+
+[node name="Sprint03CoreTest" type="Node" unique_id=373750614]
+script = ExtResource("1_afm5x")
