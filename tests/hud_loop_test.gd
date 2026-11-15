@@ -7,7 +7,7 @@ func _ready() -> void:
 	hud.update_hud(1, 0, 12, 0)
 
 	assert(hud.tick_label.text == "TICK: 0/12")
-	assert(hud.echo_label.text == "ECHO: 0")
+	assert(hud.echo_label.text == "ECHO: 0/2")
 	print("TEST 1 - INITIAL HUD: PASS")
 
 	# TEST 2: Tick dat gioi han
@@ -21,45 +21,41 @@ func _ready() -> void:
 		hud.update_hud(1, 0, 12, echo_count)
 
 		assert(
-			hud.echo_label.text == "ECHO: %d" % echo_count
+			hud.echo_label.text == "ECHO: %d/2" % echo_count
 		)
 
 	print("TEST 3 - ECHO COUNT: PASS")
-		# TEST 4: Kiem tra khoa input
+		
+	# TEST 4: Kiem tra khoa input qua API HUD
 	var buttons: Array[Button] = [
 		hud.up_button,
 		hud.down_button,
 		hud.left_button,
 		hud.right_button,
-		hud.wait_button
+		hud.wait_button,
+		hud.end_loop_button
 	]
-	
-		# Khoa cac nut
-	for button in buttons:
-		button.disabled = true
 
-	# Kiem tra trang thai khoa
-	for button in buttons:
-		assert(button.disabled == true)
+	hud.set_input_locked(true)
 
+	for button in buttons:
+		assert(button.disabled)
+
+	assert(not hud.restart_button.disabled)
 	print("TEST 4 - INPUT LOCK: PASS")
-	
-		# Mo khoa cac nut
-	for button in buttons:
-		button.disabled = false
 
-	# Kiem tra da mo khoa
+	hud.set_input_locked(false)
+
 	for button in buttons:
-		assert(button.disabled == false)
+		assert(not button.disabled)
 
 	print("TEST 4 - INPUT UNLOCK: PASS")
-	print("HUD LOOP TEST - CURRENT API: PASS")
 	
 	# TEST 5: Kiem tra cap nhat LOOP
 	hud.update_loop_status(2, 1, false)
 
 	assert(hud.loop_label.text == "LOOP: 2")
-	assert(hud.echo_label.text == "ECHO: 1")
+	assert(hud.echo_label.text == "ECHO: 1/2")
 	print("TEST 5 - LOOP STATUS: PASS")
 
 	# TEST 6: Kiem tra khoa nut khi ket thuc
@@ -70,9 +66,12 @@ func _ready() -> void:
 	assert(hud.left_button.disabled == true)
 	assert(hud.right_button.disabled == true)
 	assert(hud.wait_button.disabled == true)
+	assert(hud.end_loop_button.disabled)
+	assert(not hud.restart_button.disabled)
 	print("TEST 6 - FINISHED LOCK: PASS")
 
 	# Mo khoa lai
 	hud.update_loop_status(2, 1, false)
 	assert(hud.up_button.disabled == false)
+	assert(not hud.end_loop_button.disabled)
 	print("TEST 7 - UNLOCK: PASS")

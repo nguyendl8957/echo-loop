@@ -53,12 +53,13 @@ func update_hud(
 ) -> void:
 	level_label.text = "LEVEL %02d" % level
 	tick_label.text = "TICK: %d/%d" % [tick, max_tick]
-	echo_label.text = "ECHO: %d" % echo_count
+	echo_label.text = "ECHO: %d/2" % echo_count
 	
 func update_loop_status(loop_number: int, echo_count: int, is_finished: bool) -> void:
 	loop_label.text = "LOOP: %d" % loop_number
-	echo_label.text = "ECHO: %d" % echo_count
+	echo_label.text = "ECHO: %d/2" % echo_count
 	set_input_locked(is_finished)
+
 
 
 func set_input_locked(locked: bool) -> void:
@@ -67,3 +68,7 @@ func set_input_locked(locked: bool) -> void:
 	left_button.disabled = locked
 	right_button.disabled = locked
 	wait_button.disabled = locked
+	end_loop_button.disabled = locked
+
+	# Restart luon cho phep nguoi choi choi lai.
+	restart_button.disabled = false
