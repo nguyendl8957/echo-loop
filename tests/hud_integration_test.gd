@@ -17,7 +17,7 @@ func _ready() -> void:
 
 	assert(hud.level_label.text == "LEVEL 01")
 	assert(hud.tick_label.text == "TICK: 5/12")
-	assert(hud.echo_label.text == "ECHO: 0")
+	assert(hud.echo_label.text == "ECHO: 0/2")
 
 	print("TEST 1 - HUD DISPLAY: PASS")
 
