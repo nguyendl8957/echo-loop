@@ -88,3 +88,7 @@ To convert this record into the actual Level 01 solution:
 4. Confirm that only the current Player reaching Exit triggers victory; Echo standing on Exit alone must not win.
 
 Until these conditions are met, retain this file's status as `WAIT`. TV5 must not invent LevelData or change the puzzle data owned by TV3.
+
+F6 trên bản đã tích hợp: 20 PASS / 0 FAIL / 0 NOT RUN.
+Đã dùng EchoController thật trong fixture.
+Level 01 vẫn là màn không yêu cầu Echo; kiểm thử Echo + Door dùng fixture riêng.

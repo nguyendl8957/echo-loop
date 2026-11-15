@@ -82,3 +82,7 @@ When the TV2 Echo scene is absent, the runner uses `PlayerController` as a movem
 ## 7. Acceptance note
 
 The current F6 run is a **partial PASS for the independent synthetic fixture**, not a Sprint 03 Gate PASS. Do not mark Sprint 03 Gate PASS while S03-06 remains PARTIAL and S03-11, S03-12 or S03-13 remain NOT RUN/WAIT. Any change to Core, Gameplay, `project.godot`, or LevelData is outside TV5's file ownership and requires the responsible member/Leader to make the change.
+
+F6 trên bản đã tích hợp: 20 PASS / 0 FAIL / 0 NOT RUN.
+Đã dùng EchoController thật trong fixture.
+Level 01 vẫn là màn không yêu cầu Echo; kiểm thử Echo + Door dùng fixture riêng.
