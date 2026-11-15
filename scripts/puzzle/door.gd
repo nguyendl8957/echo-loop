@@ -73,6 +73,17 @@ func is_blocking() -> bool:
 	return not is_open
 
 
+## Kiểm tra nhân vật có thể bước vào trong tick hay không dựa trên snapshot đầu tick (AGENTS.md mục 2.5 / Issue #18)
+## Phương thức thuần không cache state toàn cục vào Door
+func can_enter_for_tick(snapshot_is_open: bool) -> bool:
+	return snapshot_is_open
+
+
+## Kiểm tra cửa có đang cản đường bước vào trong tick hay không dựa trên snapshot đầu tick
+func is_blocking_for_tick(snapshot_is_open: bool) -> bool:
+	return not snapshot_is_open
+
+
 ## Đặt lại trạng thái cửa về ban đầu (đóng)
 func reset_state() -> void:
 	if is_open != false:
