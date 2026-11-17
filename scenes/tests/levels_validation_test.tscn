@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tests/levels_validation_test.gd" id="1_test"]
+
+[node name="LevelsValidationTest" type="Node2D"]
+script = ExtResource("1_test")
+
+[node name="LevelFixture" type="Node2D" parent="."]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="StatusLabel" type="Label" parent="CanvasLayer"]
+offset_left = 32.0
+offset_top = 24.0
+offset_right = 600.0
+offset_bottom = 60.0
+theme_override_font_sizes/font_size = 20
+text = "Running Levels Validation..."
+
+[node name="ResultsLabel" type="Label" parent="CanvasLayer"]
+offset_left = 32.0
+offset_top = 70.0
+offset_right = 600.0
+offset_bottom = 110.0
+theme_override_font_sizes/font_size = 18
+text = "Waiting for results..."
