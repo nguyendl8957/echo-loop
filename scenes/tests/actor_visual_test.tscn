@@ -1,0 +1,130 @@
+[gd_scene format=3 uid="uid://bgmn8xppik8tc"]
+
+[ext_resource type="PackedScene" uid="uid://cchgo76cmg7j6" path="res://scenes/player/player.tscn" id="1_o2y4m"]
+[ext_resource type="PackedScene" uid="uid://cqs5152k872tb" path="res://scenes/player/echo.tscn" id="2_tqux2"]
+
+[sub_resource type="GDScript" id="GDScript_0p5tx"]
+script/source = "extends Node2D
+
+const CELL_SIZE := 48
+const PLAYER_START := Vector2i(1, 1)
+const ECHO1_START := Vector2i(2, 1)
+const ECHO2_START := Vector2i(3, 1)
+const ECHO1_TINT := Color(0.45, 0.72, 1.0, 0.7)
+const ECHO2_TINT := Color(1.0, 0.4, 1.0, 0.7)
+
+@onready var player = $Player
+@onready var echo1 = $Echo1
+@onready var echo2 = $Echo2
+
+var passed := 0
+var failed := 0
+
+
+func _ready() -> void:
+	var no_walls: Array[Vector2i] = []
+	var wall: Array[Vector2i] = [ECHO1_START]
+	_reset_display()
+
+	var moved: bool = player.apply_action(\"RIGHT\", wall)
+	_check(not moved and _at_cell(player, PLAYER_START), \"Player stays still at a wall\")
+
+	moved = player.apply_action(\"RIGHT\", no_walls)
+	_check(moved and _at_cell(player, ECHO1_START), \"Player can share a cell with Echo1\")
+
+	moved = player.apply_action(\"WAIT\", no_walls)
+	_check(not moved and _at_cell(player, ECHO1_START), \"Player WAIT keeps the same cell\")
+
+	echo1.setup_echo(
+		ECHO1_START, PackedStringArray([\"RIGHT\", \"LEFT\", \"RIGHT\"]), ECHO1_TINT
+	)
+	var expected_cells: Array[Vector2i] = [
+		ECHO1_START, PLAYER_START, ECHO1_START
+	]
+
+	for tick in range(12):
+		# Echo1's first RIGHT is blocked. Ticks 3 to 11 have no history.
+		var blockers: Array[Vector2i] = no_walls
+		if tick == 0:
+			blockers = [ECHO2_START]
+
+		var expected_cell := ECHO1_START
+		if tick < expected_cells.size():
+			expected_cell = expected_cells[tick]
+
+		var expected_move := tick == 1 or tick == 2
+		var replay_moved: bool = echo1.apply_echo_action(tick, blockers)
+		_check(
+			replay_moved == expected_move and _at_cell(echo1, expected_cell),
+			\"Echo1 tick %d ends at %s\" % [tick, expected_cell]
+		)
+
+	echo2.setup_echo(ECHO2_START, PackedStringArray([\"LEFT\"]), ECHO2_TINT)
+	moved = echo2.apply_echo_action(0, no_walls)
+	_check(
+		moved
+		and _at_cell(player, ECHO1_START)
+		and _at_cell(echo1, ECHO1_START)
+		and _at_cell(echo2, ECHO1_START),
+		\"Player and both Echoes can share the same cell\"
+	)
+
+	_reset_display()
+	_check(
+		_at_cell(player, PLAYER_START)
+		and _at_cell(echo1, ECHO1_START)
+		and _at_cell(echo2, ECHO2_START),
+		\"All actors reset to their starting cells\"
+	)
+
+	var summary := \"Actor Visual Test | PASS: %d | FAIL: %d\" % [passed, failed]
+	print(summary)
+	_show_label(\"P\", Vector2(67, 105))
+	_show_label(\"E1\", Vector2(111, 105))
+	_show_label(\"E2\", Vector2(159, 105))
+	_show_label(summary, Vector2(25, 145))
+
+
+func _reset_display() -> void:
+	player.reset_position(PLAYER_START)
+	echo1.setup_echo(ECHO1_START, PackedStringArray(), ECHO1_TINT)
+	echo2.setup_echo(ECHO2_START, PackedStringArray(), ECHO2_TINT)
+
+
+func _at_cell(actor, cell: Vector2i) -> bool:
+	var center := Vector2(cell) * CELL_SIZE + Vector2.ONE * CELL_SIZE * 0.5
+	var sprite := actor.get_node(\"Sprite2D\") as Sprite2D
+	return (
+		actor.grid_position == cell
+		and actor.position.is_equal_approx(center)
+		and sprite.position.is_equal_approx(Vector2.ZERO)
+	)
+
+
+func _check(condition: bool, message: String) -> void:
+	if condition:
+		passed += 1
+		print(\"PASS \", message)
+	else:
+		failed += 1
+		push_error(\"FAIL \" + message)
+
+
+func _show_label(message: String, label_position: Vector2) -> void:
+	var label := Label.new()
+	label.text = message
+	label.position = label_position
+	add_child(label)
+"
+
+[node name="ActorVisualTest" type="Node2D" unique_id=1386795897]
+script = SubResource("GDScript_0p5tx")
+
+[node name="Player" parent="." unique_id=1364354151 instance=ExtResource("1_o2y4m")]
+position = Vector2(72, 72)
+
+[node name="Echo1" parent="." unique_id=98339172 instance=ExtResource("2_tqux2")]
+position = Vector2(120, 72)
+
+[node name="Echo2" parent="." unique_id=337693139 instance=ExtResource("2_tqux2")]
+position = Vector2(168, 72)
