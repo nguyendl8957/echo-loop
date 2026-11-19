@@ -7,8 +7,11 @@ signal player_entered(grid_pos: Vector2i)
 ## Hằng số kích thước ô lưới chuẩn theo AGENTS.md
 const CELL_SIZE: int = 48
 
-## Màu sắc hiển thị theo visual spec (AGENTS.md mục 3.3 - Tím xoáy năng lượng nổi bật)
+## Màu sắc hiển thị fallback theo visual spec (AGENTS.md mục 3.3 - Tím xoáy năng lượng nổi bật)
 const COLOR_PORTAL: Color = Color(0.75, 0.2, 0.9, 1.0)
+
+## Đường dẫn sprite chuẩn bàn giao từ TV2 (Issue #42 / #22)
+const TEXTURE_PORTAL_PATH: String = "res://assets/sprites/objects/exit_portal.png"
 
 ## Tọa độ logic trên bản đồ lưới (Vector2i)
 @export var grid_position: Vector2i = Vector2i.ZERO:
@@ -16,13 +19,37 @@ const COLOR_PORTAL: Color = Color(0.75, 0.2, 0.9, 1.0)
 		grid_position = value
 		update_visual_position()
 
+var _texture_portal: Texture2D = null
+
 @onready var sprite_2d: Sprite2D = $Sprite2D
 
 
 func _ready() -> void:
-	_ensure_placeholder_texture()
+	_load_textures()
 	update_visual_position()
-	if sprite_2d != null:
+	_update_visual_state()
+
+
+## Nạp texture thật từ assets/sprites/objects/ (nếu có), ngược lại dùng placeholder
+func _load_textures() -> void:
+	if ResourceLoader.exists(TEXTURE_PORTAL_PATH):
+		_texture_portal = ResourceLoader.load(TEXTURE_PORTAL_PATH) as Texture2D
+	if _texture_portal == null:
+		_ensure_placeholder_texture()
+
+
+## Cập nhật texture hoặc màu sắc hiển thị
+func _update_visual_state() -> void:
+	if sprite_2d == null:
+		return
+	if _texture_portal == null:
+		_load_textures()
+	sprite_2d.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	if _texture_portal != null:
+		sprite_2d.texture = _texture_portal
+		sprite_2d.modulate = Color.WHITE
+	else:
+		_ensure_placeholder_texture()
 		sprite_2d.modulate = COLOR_PORTAL
 
 

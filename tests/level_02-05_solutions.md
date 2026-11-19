@@ -3,7 +3,7 @@
 **Issue:** #23  
 **Owner:** TV3 (Gia Huy)  
 **Source baseline:** `main` (commit `58aa072` - tích hợp đầy đủ Sprint 03)  
-**Status:** `VERIFIED & PASSED` (F6 test runner: 134/134 assertions passed, 0 failed)  
+**Status:** `VERIFIED & PASSED` (F6 test runner: 152/152 assertions passed, 0 failed)  
 
 ---
 
@@ -176,6 +176,7 @@ Bộ 4 màn chơi cốt lõi được thiết kế theo lộ trình sư phạm (
 ==================================================
 STARTING LEVELS VALIDATION SUITE (LEVELS 02 - 05)
 ==================================================
+--- Validating Puzzle Sprite Integration (TV2 -> TV3) --- (18 checks PASS)
 --- Validating Resource: res://data/levels/level_02.tres --- (19 checks PASS)
 --- Validating Resource: res://data/levels/level_03.tres --- (19 checks PASS)
 --- Validating Resource: res://data/levels/level_04.tres --- (19 checks PASS)
@@ -185,14 +186,15 @@ STARTING LEVELS VALIDATION SUITE (LEVELS 02 - 05)
 --- Testing Level 04: Two Paths Solution --- (8 checks PASS)
 --- Testing Level 05: Double Echo Solution --- (14 checks PASS)
 
-LEVELS VALIDATION: 134 PASSED | 0 FAILED
+LEVELS VALIDATION: 152 PASSED | 0 FAILED
 ==================================================
 ```
 
 ### 6.2. Kiểm tra Regression trên toàn bộ Project
-1. `scenes/tests/levels_validation_test.tscn`: **134/134 PASSED (0 FAILED)**
-2. `scenes/tests/puzzle_tick_test.tscn`: **34/34 PASSED (0 FAILED)**
-3. `scenes/tests/level_01_test.tscn`: **21/21 PASSED (0 FAILED)**
-4. `scenes/tests/sprint_03_core_test.tscn`: **19/19 PASSED (0 FAILED)**
-5. `scenes/tests/replay_regression_test.tscn`: **20/20 PASSED (0 FAILED)**
-6. Chạy F5 Main Menu $\leftrightarrow$ Gameplay: Hoạt động bình thường, không có lỗi runtime/debugger đỏ.
+1. `scenes/tests/levels_validation_test.tscn`: **152/152 PASSED (0 FAILED)**
+2. `scenes/tests/puzzle_test.tscn`: **31/31 PASSED (0 FAILED)**
+3. `scenes/tests/puzzle_tick_test.tscn`: **34/34 PASSED (0 FAILED)**
+4. `scenes/tests/level_01_test.tscn`: **21/21 PASSED (0 FAILED)**
+5. `scenes/tests/sprint_03_core_test.tscn`: **19/19 PASSED (0 FAILED)**
+6. `scenes/tests/replay_regression_test.tscn`: **20/20 PASSED (0 FAILED)**
+7. Chạy F5 Main Menu $\leftrightarrow$ Gameplay: Hoạt động bình thường, không có lỗi runtime/debugger đỏ.

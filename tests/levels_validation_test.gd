@@ -82,16 +82,75 @@ func check(condition: bool, description: String) -> void:
 
 
 func run_all_validations() -> void:
-	# 1. Kiểm tra tĩnh dữ liệu 4 màn chơi
+	# 1. Kiểm tra tích hợp visual sprite Puzzle bàn giao từ TV2 (Issue #42 / #22)
+	validate_puzzle_visual_integration()
+
+	# 2. Kiểm tra tĩnh dữ liệu 4 màn chơi
 	for lvl_id in range(2, 6):
 		var path := "res://data/levels/level_%02d.tres" % lvl_id
 		validate_level_resource(lvl_id, path)
 
-	# 2. Mô phỏng lời giải hoàn chỉnh theo 7 bước chuẩn của từng màn
+	# 3. Mô phỏng lời giải hoàn chỉnh theo 7 bước chuẩn của từng màn
 	test_level_02_solution()
 	test_level_03_solution()
 	test_level_04_solution()
 	test_level_05_solution()
+
+
+## Kiểm tra tích hợp 5 sprite vật thể Puzzle 48x48 px từ TV2 vào 3 scene Puzzle của TV3
+func validate_puzzle_visual_integration() -> void:
+	print("\n--- Validating Puzzle Sprite Integration (TV2 -> TV3) ---")
+	const SWITCH_SCENE: PackedScene = preload("res://scenes/puzzle/pressure_switch.tscn")
+	const DOOR_SCENE: PackedScene = preload("res://scenes/puzzle/door.tscn")
+	const EXIT_SCENE: PackedScene = preload("res://scenes/puzzle/exit_portal.tscn")
+
+	var sw := SWITCH_SCENE.instantiate() as PressureSwitch
+	var door := DOOR_SCENE.instantiate() as Door
+	var exit_portal := EXIT_SCENE.instantiate() as ExitPortal
+	add_child(sw)
+	add_child(door)
+	add_child(exit_portal)
+
+	sw.grid_position = Vector2i(1, 1)
+	door.grid_position = Vector2i(2, 1)
+	door.linked_switches = [sw]
+	exit_portal.grid_position = Vector2i(3, 1)
+
+	# Kiểm tra PressureSwitch OFF / ON texture
+	check(sw.sprite_2d != null and sw.sprite_2d.texture != null, "PressureSwitch has texture assigned")
+	check(sw.sprite_2d.texture.resource_path == "res://assets/sprites/objects/switch_off.png", "PressureSwitch initial texture is switch_off.png")
+	check(sw.sprite_2d.texture.get_size() == Vector2(48, 48), "switch_off.png size is 48x48 px")
+	check(sw.sprite_2d.modulate == Color.WHITE, "PressureSwitch modulate is Color.WHITE for real sprite")
+
+	# Kiểm tra Door CLOSED texture
+	check(door.sprite_2d != null and door.sprite_2d.texture != null, "Door has texture assigned")
+	check(door.sprite_2d.texture.resource_path == "res://assets/sprites/objects/door_closed.png", "Door initial texture is door_closed.png")
+	check(door.sprite_2d.texture.get_size() == Vector2(48, 48), "door_closed.png size is 48x48 px")
+	check(door.sprite_2d.modulate == Color.WHITE, "Door modulate is Color.WHITE for real sprite")
+
+	# Kích hoạt Switch -> kiểm tra chuyển sang switch_on.png và door_open.png
+	sw.update_state([Vector2i(1, 1)])
+	door.evaluate_state()
+	check(sw.sprite_2d.texture.resource_path == "res://assets/sprites/objects/switch_on.png", "PressureSwitch active texture switches to switch_on.png")
+	check(sw.sprite_2d.texture.get_size() == Vector2(48, 48), "switch_on.png size is 48x48 px")
+	check(door.sprite_2d.texture.resource_path == "res://assets/sprites/objects/door_open.png", "Door open texture switches to door_open.png")
+	check(door.sprite_2d.texture.get_size() == Vector2(48, 48), "door_open.png size is 48x48 px")
+
+	# Reset -> kiểm tra trở về switch_off.png và door_closed.png
+	sw.reset_state()
+	door.reset_state()
+	check(sw.sprite_2d.texture.resource_path == "res://assets/sprites/objects/switch_off.png", "PressureSwitch reset restores switch_off.png")
+	check(door.sprite_2d.texture.resource_path == "res://assets/sprites/objects/door_closed.png", "Door reset restores door_closed.png")
+
+	# Kiểm tra ExitPortal texture
+	check(exit_portal.sprite_2d != null and exit_portal.sprite_2d.texture != null, "ExitPortal has texture assigned")
+	check(exit_portal.sprite_2d.texture.resource_path == "res://assets/sprites/objects/exit_portal.png", "ExitPortal texture is exit_portal.png")
+	check(exit_portal.sprite_2d.texture.get_size() == Vector2(48, 48), "exit_portal.png size is 48x48 px")
+	check(exit_portal.sprite_2d.modulate == Color.WHITE, "ExitPortal modulate is Color.WHITE for real sprite")
+
+	sw.queue_free()
+	door.queue_free()
+	exit_portal.queue_free()
 
 
 ## Kiểm tra tính hợp lệ về cấu trúc dữ liệu của file .tres

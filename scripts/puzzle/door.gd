@@ -7,9 +7,13 @@ signal state_changed(is_open: bool)
 ## Hằng số kích thước ô lưới chuẩn theo AGENTS.md
 const CELL_SIZE: int = 48
 
-## Màu sắc hiển thị theo visual spec (AGENTS.md mục 3.3)
+## Màu sắc hiển thị fallback theo visual spec (AGENTS.md mục 3.3)
 const COLOR_CLOSED: Color = Color(0.95, 0.2, 0.2, 1.0)       # Đỏ khóa khi cửa đóng
 const COLOR_OPEN: Color = Color(0.2, 0.9, 0.9, 0.35)         # Cyan / Xanh ngọc mờ khi cửa mở
+
+## Đường dẫn sprite chuẩn bàn giao từ TV2 (Issue #42 / #22)
+const TEXTURE_CLOSED_PATH: String = "res://assets/sprites/objects/door_closed.png"
+const TEXTURE_OPEN_PATH: String = "res://assets/sprites/objects/door_open.png"
 
 ## Tọa độ logic trên bản đồ lưới (Vector2i)
 @export var grid_position: Vector2i = Vector2i.ZERO:
@@ -23,12 +27,14 @@ const COLOR_OPEN: Color = Color(0.2, 0.9, 0.9, 0.35)         # Cyan / Xanh ngọ
 ## Trạng thái mở cửa hiện tại
 var is_open: bool = false
 
+var _texture_closed: Texture2D = null
+var _texture_open: Texture2D = null
+
 @onready var sprite_2d: Sprite2D = $Sprite2D
 
 
 func _ready() -> void:
-	# Khởi tạo placeholder texture nếu chưa gán sprite để hiển thị rõ ràng trên màn hình
-	_ensure_placeholder_texture()
+	_load_textures()
 	update_visual_position()
 	_update_visual_state()
 
@@ -92,9 +98,28 @@ func reset_state() -> void:
 		state_changed.emit(is_open)
 
 
-## Cập nhật màu sắc theo trạng thái open/closed
+## Nạp texture thật từ assets/sprites/objects/ (nếu có), ngược lại dùng placeholder
+func _load_textures() -> void:
+	if ResourceLoader.exists(TEXTURE_CLOSED_PATH):
+		_texture_closed = ResourceLoader.load(TEXTURE_CLOSED_PATH) as Texture2D
+	if ResourceLoader.exists(TEXTURE_OPEN_PATH):
+		_texture_open = ResourceLoader.load(TEXTURE_OPEN_PATH) as Texture2D
+	if _texture_closed == null or _texture_open == null:
+		_ensure_placeholder_texture()
+
+
+## Cập nhật texture hoặc màu sắc theo trạng thái open/closed
 func _update_visual_state() -> void:
-	if sprite_2d != null:
+	if sprite_2d == null:
+		return
+	if _texture_closed == null and _texture_open == null:
+		_load_textures()
+	sprite_2d.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	if _texture_closed != null and _texture_open != null:
+		sprite_2d.texture = _texture_open if is_open else _texture_closed
+		sprite_2d.modulate = Color.WHITE
+	else:
+		_ensure_placeholder_texture()
 		sprite_2d.modulate = COLOR_OPEN if is_open else COLOR_CLOSED
 
 
