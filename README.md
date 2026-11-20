@@ -69,3 +69,59 @@ Các thư mục chưa có file có thể không xuất hiện sau clone vì Git 
 - Không đưa `*.keystore`, mật khẩu, credential, file APK build và thư mục `.godot/` vào Git.
 - Đồ án dùng Godot offline; Firebase không nằm trong phạm vi.
 - Liên hệ leader trên kênh nhóm khi gặp lệch kiến trúc hoặc API chưa tồn tại.
+
+---
+
+## Cap nhat Sprint 04 - Tich hop 5 level
+
+**Phien ban phat trien:** Godot 4.7.2 / GDScript.
+**Pham vi:** Leader Integration - Issue #21.
+
+Ghi chu: Thong tin Skeleton v0.1.1 o dau README la lich su
+du an, khong con phan anh day du trang thai hien tai.
+
+### Gameplay da tich hop
+
+- Nap Level 01-05 qua `LevelManager`.
+- Player, Echo, switch, door va Exit trong Gameplay.
+- HUD hien thi Level, Tick, Loop va so Echo.
+- Level Select kiem tra quyen mo khoa qua SaveManager.
+- Thang man hien Level Complete.
+- Next Level chi chuyen khi nguoi choi bam nut.
+- Replay khoi tao lai luot choi va xoa Echo run cu.
+- Pause / Resume / Restart / Main Menu.
+- Save luu tien trinh mo khoa va tuy chon am thanh.
+
+### Chay thu
+
+1. Mo `project.godot` bang Godot 4.7.2.
+2. Nhan F5 de vao Main Menu.
+3. Chon New Game de choi Level 01.
+4. Chon Continue de mo Level Select.
+5. Hoan thanh man de mo khoa man tiep theo.
+6. Su dung Pause de tam dung va Resume de choi tiep.
+
+### Kiem thu Sprint 04
+
+- `scenes/tests/sprint_04_flow_test.tscn`
+- `scenes/tests/sprint_03_core_test.tscn`
+- `scenes/tests/echo_test.tscn`
+- `scenes/tests/puzzle_tick_test.tscn`
+- `scenes/tests/levels_validation_test.tscn`
+
+Leader da bao cao cac buoc F5/F6 tich hop PASS.
+Ket qua chi tiet va bang chung can duoc dinh kem trong PR.
+Viec nghiem thu Sprint 04 cuoi cung phu thuoc regression/QA
+va review PR, khong chi dua tren viec game mo duoc.
+
+### Quy uoc source
+
+- Game Core: `scripts/core/`
+- Gameplay scene: `scenes/gameplay/gameplay.tscn`
+- Level Resources: `data/levels/`
+- UI scenes: `scenes/ui/`
+- SaveManager: `scripts/data/save_manager.gd`
+- Test scripts: `tests/`
+
+Khong thay doi luat 12 tick, toi da 2 Echo
+hoac thu tu xu ly door snapshot.
