@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://bwdcax50h0a2r" path="res://scripts/core/gameplay.gd" id="1_elxb5"]
 [ext_resource type="PackedScene" uid="uid://cchgo76cmg7j6" path="res://scenes/player/player.tscn" id="2_x0t60"]
 [ext_resource type="PackedScene" uid="uid://bopc2s1tttpqo" path="res://scenes/ui/hud.tscn" id="3_2p25t"]
+[ext_resource type="PackedScene" uid="uid://drrakppaejgj7" path="res://scenes/ui/level_complete.tscn" id="4_m3hu3"]
+[ext_resource type="PackedScene" uid="uid://dem4pnc5oo4hk" path="res://scenes/ui/pause_menu.tscn" id="5_q64rj"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_elxb5"]
 content_margin_left = 16.0
@@ -98,3 +100,26 @@ position = Vector2(400, 200)
 position = Vector2(640, 360)
 
 [node name="HUD" parent="." unique_id=985695084 instance=ExtResource("3_2p25t")]
+
+[node name="ResultLayer" type="CanvasLayer" parent="." unique_id=1485569698]
+layer = 2
+
+[node name="LevelComplete" parent="ResultLayer" unique_id=1855029343 instance=ExtResource("4_m3hu3")]
+visible = false
+
+[node name="PauseLayer" type="CanvasLayer" parent="." unique_id=1456918520]
+layer = 3
+
+[node name="PauseButton" type="Button" parent="PauseLayer" unique_id=938206738]
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_top = 80.0
+offset_right = -20.0
+offset_bottom = 130.0
+grow_horizontal = 0
+text = "PAUSE"
+
+[node name="PauseMenu" parent="PauseLayer" unique_id=603466757 instance=ExtResource("5_q64rj")]
+visible = false

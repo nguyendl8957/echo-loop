@@ -260,3 +260,137 @@ Core quyết định khi nào khóa hoặc mở input.
 `is_finished = true` nghĩa là Gameplay tạm thời hoặc
 vĩnh viễn không nhận action, không phải tự động báo thắng.
 Sau khi chuyển sang vòng mới, Core phải mở khóa input.
+
+---
+
+## 12. Sprint 04 - Leader Integration Contract (Issue #21)
+
+**Trang thai:** Da tich hop tren branch feature/EL-S04-L;
+cho review PR va nghiem thu regression cuoi cung.
+**Godot:** 4.7.2.
+**Owner:** Leader.
+
+### 12.1 LevelManager
+
+Script: `res://scripts/core/level_manager.gd`
+
+- `LevelManager.MIN_LEVEL = 1`
+- `LevelManager.MAX_LEVEL = 5`
+- `LevelManager.load_level(level_id: int) -> LevelData`
+
+LevelManager nap LevelData tu:
+`res://data/levels/level_01.tres` den `level_05.tres`.
+
+Du lieu khong hop le hoac level nam ngoai 1-5
+phai duoc tu choi, khong tu tao level moi.
+
+### 12.2 GameManager
+
+Autoload: `GameManager`.
+
+Public API duoc Gameplay/UI su dung:
+
+- `start_new_game() -> void`
+- `open_gameplay() -> void`
+- `back_to_menu() -> void`
+- `complete_level() -> void`
+- `get_unlocked_level() -> int`
+- `can_play_level(level_id: int) -> bool`
+- `select_level(level_id: int) -> bool`
+- `open_level_select() -> void`
+
+GameManager giu `current_level` va dieu huong scene.
+`complete_level()` chi xu ly mot lan cho moi lan choi
+va cap nhat `unlocked_level` qua SaveManager.
+
+So level mo khoa duoc gioi han trong khoang 1-5.
+Thang Level 05 khong duoc mo khoa Level 06.
+
+### 12.3 Level Select - TV4
+
+Scene: `res://scenes/ui/level_select.tscn`
+Script: `res://scripts/ui/level_select.gd`
+
+Signals:
+- `level_selected(level_id: int)`
+- `back_requested`
+
+Method:
+- `set_unlocked_levels(unlocked_count: int) -> void`
+
+GameManager ket noi signal va ap dung quyen truy cap.
+Level Select khong tu thay doi Save.
+
+### 12.4 Level Complete - TV4
+
+Scene: `res://scenes/ui/level_complete.tscn`
+
+Signals:
+- `result_next_requested`
+- `result_replay_requested`
+- `result_level_select_requested`
+
+Method:
+- `set_completed_level(level_id: int) -> void`
+
+Gameplay hien Level Complete khi Player den Exit.
+Next khong tu dong chay; phai co yeu cau cua nguoi choi.
+Tai Level 05, nut Next bi vo hieu hoa.
+
+### 12.5 Pause Menu - TV4
+
+Scene: `res://scenes/ui/pause_menu.tscn`
+
+Signals:
+- `pause_resume_requested`
+- `pause_restart_requested`
+- `pause_menu_requested`
+
+Gameplay dieu khien trang thai Pause.
+Trong khi Pause, khong ghi action va khong ket thuc loop.
+Resume khong tu tang tick.
+Restart nap lai current level, xoa run va Echo cu.
+Menu quay ve Main Menu.
+
+Co che hien tai khoa input gameplay;
+khong su dung `SceneTree.paused` de dung toan bo scene.
+
+### 12.6 SaveManager - TV5
+
+Script: `res://scripts/data/save_manager.gd`
+
+Core tao instance tu script preload,
+khong them SaveManager vao Autoload.
+
+Du lieu luu:
+- `unlocked_level`
+- `sound_enabled`
+
+Khong luu tick, vi tri Player, Echo histories
+hoac trang thai dang choi do.
+
+### 12.7 Gameplay invariant
+
+- Moi Time Loop co 12 tick.
+- Toi da 2 Echo.
+- Action bi chan va WAIT van tieu ton tick.
+- End Loop som dem WAIT.
+- Moi actor dung door snapshot dau tick.
+- Player va Echo di chuyen truoc khi cap nhat switch/door.
+- Chi Player hien tai duoc kich hoat Exit.
+- Player va Echo co the trung o.
+
+### 12.8 Dieu kien nghiem thu
+
+- Level 01-05 nap dung Resource.
+- Level Select ton trong unlocked_level.
+- Next / Replay / Level Select hoat dong.
+- Pause khong lam tang tick.
+- Restart xoa Echo run hien tai.
+- Save ton tai sau khi khoi dong lai game.
+- Level 05 khong mo khoa Level 06.
+- F6 regression khong co FAIL.
+- F5 qua it nhat hai man lien tiep khong crash.
+
+Ket qua test, anh chup va cac han che con lai
+can ghi trong PR Issue #21.
