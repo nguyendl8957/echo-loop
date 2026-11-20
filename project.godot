@@ -13,6 +13,9 @@ config_version=5
 config/name="EchoLoop"
 run/main_scene="uid://cpx8e7eys1snm"
 config/features=PackedStringArray("4.7", "GL Compatibility")
+boot_splash/bg_color=Color(0.003921569, 0.039215688, 0.16470589, 1)
+boot_splash/stretch_mode=2
+boot_splash/image="uid://dcknko4mfna2l"
 config/icon="res://icon.svg"
 
 [autoload]
@@ -34,3 +37,4 @@ window/stretch/mode="canvas_items"
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
