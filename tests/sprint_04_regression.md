@@ -119,5 +119,35 @@ Các điểm 2–6 là integration gap hoặc dependency cần Leader/TV3/TV4 x�
 
 Chỉ đề nghị PASS khi F5 menu → select → đủ 5 Level → win/unlock/next, Tutorial, Pause, Restart, Result, Save/Audio đều được xác minh trên integration/main; cả 5 lời giải được kiểm chứng; các PR đã merge và regression trên main không có blocker. Không lấy kết quả F6 độc lập thay cho F5 end-to-end.
 
+---
+
+## Sprint 04 - Final Integration Verification (2026-11-20)
+
+Integration baseline: main sau PR #48 va PR #49.
+
+### F6
+- Save/Audio fixture: 16 PASS / 0 FAIL / 2 NOT RUN.
+- Level Resource Check: 10 PASS / 0 FAIL / 0 NOT RUN.
+- Sprint 04 Flow: 26 PASS / 0 FAIL.
+- Sprint 03 Core: 43 PASS / 0 FAIL.
+- Levels Validation: 152 PASS / 0 FAIL.
+- Cac regression suite con lai: Leader bao cao 0 FAIL.
+
+### F5
+- Level 03 -> 04 -> 05: PASS.
+- Level 05 su dung 2 Echo: PASS.
+- Unlock khong vuot Level 05: PASS.
+- Save persistence sau restart: PASS.
+- Audio ON/OFF va restore preference: PASS.
+- Tutorial, Pause, Next, Replay: PASS.
+
+### Remaining notes
+- Hai NOT RUN thuoc fixture Save/Audio doc lap;
+  cac hanh vi GameManager lien quan da duoc Leader
+  kiem thu tren integration flow.
+- F6 Level Resources khong thay the kiem thu
+  loi giai gameplay.
+- Ket qua F5/F6 tren duoc Leader bao cao;
+  bang chung chi tiet luu trong PR va test record.
 
 
