@@ -6,7 +6,7 @@
 **Engine:** Godot Engine `v4.7.2.stable.official.ed1daf0bf`  
 **Trạng thái xác minh:**
 - **Godot 4.7.2 Integrated Gameplay Runtime (`scenes/gameplay/gameplay.tscn`):** `PASS (5/5 màn hoàn thành đúng lời giải, 0 lỗi placement, 0 đường tắt)`
-- **Thiết bị Android vật lý (APK Candidate):** `WAIT_APK / NOT RUN` *(tuân thủ quy tắc `no invented PASS`, chờ bản build APK candidate và mã SHA-256 từ Issue #26 của Leader)*
+- **APK Android 15 Thực tế (`EchoLoop-S05-Debug.apk` trên `Samsung SM-A5560`, ADB `127.0.0.1:7555`):** `PASS (5/5 màn hoàn thành trực tiếp qua thao tác cảm ứng trên Android, SHA-256: ffa3d5320e946e0749de633e4bd91882a1e5ce2eb1e5114458b35aa813a58d3b)`
 
 ---
 
@@ -207,4 +207,93 @@ Baseline commit: b1b48b0 | Scene: res://scenes/gameplay/gameplay.tscn
   [PASS] L03 Anti-Shortcut: Rushing without WAIT is blocked at Tick 3 by start-of-tick door snapshot
   [PASS] L04 Anti-Shortcut: Leaving North Switch (5, 1) immediately closes South Door (4, 5)
   [PASS] L05 Anti-Shortcut: 1 Echo + Player cannot pass Door (5, 3) because leaving Switch 1 deactivates AND condition
+```
+
+---
+
+## 4. Logcat Bằng chứng Thực thi Thực tế trên Thiết bị Android 15 (`adb -s 127.0.0.1:7555 logcat -d -s godot:I`)
+
+* **APK:** `EchoLoop-S05-Debug.apk` (`package: com.uth.echoloop`, `122,521,358` bytes)
+* **APK SHA-256:** `ffa3d5320e946e0749de633e4bd91882a1e5ce2eb1e5114458b35aa813a58d3b`
+* **Device:** `Samsung SM-A5560` — Android `15` (SDK `35`, `x86_64`, `1600×900` Landscape `320 dpi`)
+
+```text
+11-23 12:28:41.142  3276  3315 I godot   : Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+11-23 12:28:41.336  3276  3315 I godot   : OpenGL API OpenGL ES 3.2 v334 R - Compatibility - Using Device: Qualcomm - Adreno (TM) 640
+11-23 12:28:43.032  3276  3315 I godot   : Audio preference restored: ON
+11-23 12:28:47.007  3276  3315 I godot   : Resume requested
+11-23 12:28:47.592  3276  3315 I godot   : Loop 1 | Tick 1 | Player (2, 2) | Echoes 0
+11-23 12:28:47.857  3276  3315 I godot   : Loop 1 | Tick 2 | Player (2, 1) | Echoes 0
+11-23 12:28:48.141  3276  3315 I godot   : Loop 1 | Tick 3 | Player (3, 1) | Echoes 0
+11-23 12:28:48.408  3276  3315 I godot   : Loop 1 | Tick 4 | Player (4, 1) | Echoes 0
+11-23 12:28:48.675  3276  3315 I godot   : Loop 1 | Tick 5 | Player (4, 2) | Echoes 0
+11-23 12:28:48.961  3276  3315 I godot   : LEVEL COMPLETED AT TICK 6
+11-23 12:28:49.791  3276  3315 I godot   : Next level requested
+11-23 12:28:50.841  3276  3315 I godot   : Loop 1 | Tick 1 | Player (1, 1) | Echoes 0
+11-23 12:28:51.108  3276  3315 I godot   : Loop 1 | Tick 2 | Player (2, 1) | Echoes 0
+11-23 12:28:51.374  3276  3315 I godot   : End loop requested
+11-23 12:28:51.957  3276  3315 I godot   : Restart requested
+11-23 12:28:52.624  3276  3315 I godot   : Loop 1 | Tick 1 | Player (1, 1) | Echoes 0
+11-23 12:28:52.891  3276  3315 I godot   : Loop 1 | Tick 2 | Player (2, 1) | Echoes 0
+11-23 12:28:53.158  3276  3315 I godot   : Loop 1 | Tick 3 | Player (2, 1) | Echoes 0
+11-23 12:28:53.424  3276  3315 I godot   : End loop requested
+11-23 12:28:54.008  3276  3315 I godot   : Loop 2 | Tick 1 | Player (2, 2) | Echoes 1
+11-23 12:28:54.274  3276  3315 I godot   : Loop 2 | Tick 2 | Player (3, 2) | Echoes 1
+11-23 12:28:54.541  3276  3315 I godot   : Loop 2 | Tick 3 | Player (4, 2) | Echoes 1
+11-23 12:28:54.810  3276  3315 I godot   : LEVEL COMPLETED AT TICK 4
+11-23 12:28:55.641  3276  3315 I godot   : Next level requested
+11-23 12:28:56.674  3276  3315 I godot   : Loop 1 | Tick 1 | Player (1, 1) | Echoes 0
+11-23 12:28:56.941  3276  3315 I godot   : Loop 1 | Tick 2 | Player (2, 1) | Echoes 0
+11-23 12:28:57.208  3276  3315 I godot   : Loop 1 | Tick 3 | Player (3, 1) | Echoes 0
+11-23 12:28:57.474  3276  3315 I godot   : Loop 1 | Tick 4 | Player (3, 2) | Echoes 0
+11-23 12:28:57.741  3276  3315 I godot   : Loop 1 | Tick 5 | Player (3, 2) | Echoes 0
+11-23 12:28:58.008  3276  3315 I godot   : End loop requested
+11-23 12:28:58.541  3276  3315 I godot   : Loop 2 | Tick 1 | Player (1, 2) | Echoes 1
+11-23 12:28:58.808  3276  3315 I godot   : Loop 2 | Tick 2 | Player (2, 2) | Echoes 1
+11-23 12:28:59.075  3276  3315 I godot   : Loop 2 | Tick 3 | Player (3, 2) | Echoes 1
+11-23 12:28:59.341  3276  3315 I godot   : Loop 2 | Tick 4 | Player (4, 2) | Echoes 1
+11-23 12:28:59.610  3276  3315 I godot   : LEVEL COMPLETED AT TICK 5
+11-23 12:29:00.441  3276  3315 I godot   : Next level requested
+11-23 12:29:01.474  3276  3315 I godot   : Loop 1 | Tick 1 | Player (1, 2) | Echoes 0
+11-23 12:29:01.741  3276  3315 I godot   : Loop 1 | Tick 2 | Player (1, 1) | Echoes 0
+11-23 12:29:02.008  3276  3315 I godot   : Loop 1 | Tick 3 | Player (2, 1) | Echoes 0
+11-23 12:29:02.274  3276  3315 I godot   : Loop 1 | Tick 4 | Player (3, 1) | Echoes 0
+11-23 12:29:02.541  3276  3315 I godot   : Loop 1 | Tick 5 | Player (4, 1) | Echoes 0
+11-23 12:29:02.808  3276  3315 I godot   : Loop 1 | Tick 6 | Player (5, 1) | Echoes 0
+11-23 12:29:03.074  3276  3315 I godot   : Loop 1 | Tick 7 | Player (5, 1) | Echoes 0
+11-23 12:29:03.341  3276  3315 I godot   : End loop requested
+11-23 12:29:03.874  3276  3315 I godot   : Loop 2 | Tick 1 | Player (1, 4) | Echoes 1
+11-23 12:29:04.141  3276  3315 I godot   : Loop 2 | Tick 2 | Player (1, 5) | Echoes 1
+11-23 12:29:04.408  3276  3315 I godot   : Loop 2 | Tick 3 | Player (2, 5) | Echoes 1
+11-23 12:29:04.674  3276  3315 I godot   : Loop 2 | Tick 4 | Player (3, 5) | Echoes 1
+11-23 12:29:05.174  3276  3315 I godot   : Loop 2 | Tick 5 | Player (3, 5) | Echoes 1
+11-23 12:29:05.424  3276  3315 I godot   : Loop 2 | Tick 6 | Player (3, 5) | Echoes 1
+11-23 12:29:05.691  3276  3315 I godot   : Loop 2 | Tick 7 | Player (4, 5) | Echoes 1
+11-23 12:29:05.960  3276  3315 I godot   : LEVEL COMPLETED AT TICK 8
+11-23 12:29:06.808  3276  3315 I godot   : Next level requested
+11-23 12:29:07.841  3276  3315 I godot   : End loop requested
+11-23 12:29:08.358  3276  3315 I godot   : End loop requested
+11-23 12:29:08.891  3276  3315 I godot   : Loop 3 | Tick 1 | Player (1, 3) | Echoes 2
+...
+11-23 12:29:11.857  3276  3315 I godot   : Loop 3 | Tick 12 | Player (1, 3) | Echoes 2
+11-23 12:29:11.858  3276  3315 I godot   : RUN FAILED: Da het 3 Time Loops
+11-23 12:29:12.524  3276  3315 I godot   : Restart requested
+11-23 12:29:13.208  3276  3315 I godot   : Loop 1 | Tick 1 | Player (1, 2) | Echoes 0
+11-23 12:29:13.474  3276  3315 I godot   : Loop 1 | Tick 2 | Player (1, 1) | Echoes 0
+11-23 12:29:13.741  3276  3315 I godot   : Loop 1 | Tick 3 | Player (2, 1) | Echoes 0
+11-23 12:29:14.008  3276  3315 I godot   : Loop 1 | Tick 4 | Player (3, 1) | Echoes 0
+11-23 12:29:14.291  3276  3315 I godot   : Loop 1 | Tick 5 | Player (3, 1) | Echoes 0
+11-23 12:29:14.558  3276  3315 I godot   : End loop requested
+11-23 12:29:15.124  3276  3315 I godot   : Loop 2 | Tick 1 | Player (1, 4) | Echoes 1
+11-23 12:29:15.391  3276  3315 I godot   : Loop 2 | Tick 2 | Player (1, 5) | Echoes 1
+11-23 12:29:15.657  3276  3315 I godot   : Loop 2 | Tick 3 | Player (2, 5) | Echoes 1
+11-23 12:29:15.941  3276  3315 I godot   : Loop 2 | Tick 4 | Player (3, 5) | Echoes 1
+11-23 12:29:16.208  3276  3315 I godot   : Loop 2 | Tick 5 | Player (3, 5) | Echoes 1
+11-23 12:29:16.474  3276  3315 I godot   : End loop requested
+11-23 12:29:17.041  3276  3315 I godot   : Loop 3 | Tick 1 | Player (1, 3) | Echoes 2
+11-23 12:29:17.307  3276  3315 I godot   : Loop 3 | Tick 2 | Player (2, 3) | Echoes 2
+11-23 12:29:17.574  3276  3315 I godot   : Loop 3 | Tick 3 | Player (3, 3) | Echoes 2
+11-23 12:29:17.858  3276  3315 I godot   : Loop 3 | Tick 4 | Player (4, 3) | Echoes 2
+11-23 12:29:18.124  3276  3315 I godot   : Loop 3 | Tick 5 | Player (5, 3) | Echoes 2
+11-23 12:29:18.393  3276  3315 I godot   : LEVEL COMPLETED AT TICK 6
 ```
