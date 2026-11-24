@@ -1,64 +1,170 @@
-# Echo Loop - Android Export Guide
+# Echo Loop — Android Export and Release Guide
 
-## 1. Environment
+**Engine:** Godot 4.7.2 stable  
+**Renderer:** GL Compatibility  
+**Target:** Android landscape  
+**Release phase:** Sprint 05  
+**Final APK acceptance:** Pending
 
-- Engine: Godot 4.7.2 stable
-- Renderer: GL Compatibility
-- Target: Android, landscape
-- Android SDK and Java SDK paths are configured locally in Godot Editor Settings.
-- Matching Godot export templates must be installed.
+## 1. Development Environment
 
-## 2. Branding
+Requirements:
+- Godot 4.7.2 stable.
+- Matching Godot export templates.
+- Android SDK and JDK configured locally.
+- Android Debug Bridge (ADB) when needed.
+- An approved Android package identifier.
+- A physical Android device for final verification.
 
-- App name: Echo Loop
-- Launcher icon: res://assets/branding/echo_loop_icon.png
-- Boot splash: res://assets/branding/echo_loop_splash.png
-- Splash stretch mode: Keep Width
-- Splash minimum display time: 2000 ms
-- Splash background: dark navy
+Android SDK and Java SDK paths are machine-specific and must not be committed to the repository.
 
-Project settings are stored in project.godot.
+## 2. Application Configuration
 
-## 3. Android Export
+The current source includes:
+- Application name and custom branding.
+- Echo Loop launcher icon.
+- Echo Loop boot splash.
+- Dark navy splash background.
+- Two-second minimum splash duration.
+- GL Compatibility rendering.
+- A 1280 x 720 logical viewport.
+- Landscape-oriented UI design.
+- Custom Android Back navigation.
+- Main Menu Sound ON/OFF preference.
 
-1. Open the project using Godot 4.7.2.
-2. Open Project > Export.
-3. Add an Android preset if none exists.
-4. Configure the approved Android package identifier.
-5. Configure the app name, icon, architecture and landscape orientation.
-6. Check Android SDK, Java SDK and export-template configuration.
-7. Resolve any texture compression or export configuration errors.
-8. Export a Debug APK to a folder outside the repository.
-9. Install the APK on a physical Android device for verification.
+Branding assets:
+- `res://assets/branding/echo_loop_icon.png`
+- `res://assets/branding/echo_loop_splash.png`
+
+Verify the final Android export preset independently from the PC project settings.
+
+## 3. Export Preparation
+
+1. Update the source to the approved release commit.
+2. Confirm that the working tree contains no unintended changes.
+3. Open `project.godot` using Godot 4.7.2 stable.
+4. Allow resource imports to finish.
+5. Run F5 and the relevant F6 regression tests.
+6. Open Project > Export.
+7. Review the Android export preset.
+8. Confirm package identifier, version, architectures, and landscape orientation.
+9. Verify icon, splash, and renderer compatibility.
+10. Verify the export templates, SDK, and JDK.
+11. Export the APK outside the repository.
+
+Do not export a final submission APK until final level and visual changes have passed integration tests.
 
 ## 4. Signing and Security
 
-- Debug builds use debug signing.
-- Release builds must use an approved release keystore.
-- Never commit keystores, passwords, private keys or APK files.
-- export_presets.cfg is currently excluded by .gitignore.
-- Team members must configure their own local export preset.
+Debug builds may use local debug signing.
 
-## 5. Verification Status
+Release builds require an approved signing method and a safely stored release keystore when applicable.
 
-- PC F5 splash display: PASS, reported by Leader.
-- Splash minimum display time: configured to 2000 ms.
-- Android APK export: NOT RUN.
-- Physical Android install and launch: NOT RUN.
-- Android launcher icon and app label: NOT RUN.
-- Android full gameplay regression: NOT RUN.
+Never commit:
+- Keystores
+- Signing passwords
+- Private keys
+- Credentials
+- APK or AAB files
+- `.godot/` caches
+- Private device information
 
-These Android checks must be performed before the final release
-acceptance of Issue #26.
+The current repository policy excludes `export_presets.cfg`; local machines must configure the necessary export preset independently.
 
-## 6. Release Evidence
+Check Git status and staged changes before each release-related commit.
 
-For each candidate APK, record:
+## 5. Release Artifact Identity
 
-- Source commit SHA
-- APK SHA-256
-- Godot version
-- Android device model and OS version
-- Test date and test outcomes
+For every candidate, record:
 
-Keep APK artifacts outside the repository.
+| Field | Required Value |
+|---|---|
+| Source commit | Full Git SHA |
+| APK file | Exact filename |
+| APK hash | SHA-256 |
+| Godot version | Exact engine version |
+| Package identifier | Actual Android package |
+| Application version | Version name and code |
+| Device | Manufacturer and model |
+| Android version | OS/API level |
+| Tester | Person who performed the test |
+| Date | Actual execution date |
+| Result | PASS, FAIL, BLOCKED, or NOT RUN |
+| Evidence | Screenshot, log, or video reference |
+
+A result from a previous APK cannot automatically be reused as final acceptance evidence after packaged code, levels, or assets change.
+
+## 6. Physical Android Test Procedure
+
+1. Install the exact candidate APK on a real Android device.
+2. Verify the launcher icon and application name.
+3. Launch the application without internet access.
+4. Confirm landscape orientation and readable layout.
+5. Test Main Menu and Tutorial.
+6. Test Level Select and locked levels.
+7. Complete Level 01 through Level 05.
+8. Verify the 12-tick limit, blocked movement, and WAIT.
+9. Verify creation and deterministic replay of up to two Echoes.
+10. Verify switch and door behavior.
+11. Verify Pause, Resume, Restart, and Level Complete.
+12. Verify Android Back in each applicable screen.
+13. Verify Sound ON/OFF and retained preference.
+14. Close and reopen the application; verify unlocked progress.
+15. Background and resume the application.
+16. Record errors, device metadata, and supporting evidence.
+
+Different screen aspect ratios should be tested when suitable devices are available. Untested combinations must remain documented as NOT RUN.
+
+## 7. Recommended QA Ownership
+
+- Leader: export configuration, final build identity, Back navigation, release approval.
+- TV2: actor controls, replay, animation, and responsiveness.
+- TV3: level solutions, puzzle placement, switch/door behavior.
+- TV4: HUD layout, touch targets, tutorial, and navigation.
+- TV5: aggregate QA matrix, known issues, final report, release checklist.
+
+One tester may help another owner execute device tests, but the report must identify the person and actual device used.
+
+## 8. Relevant Documentation
+
+- `docs/module_contract.md`
+- `tests/android_actor_qa.md`
+- `tests/android_levels_qa.md`
+- `tests/android_ui_qa.md`
+- `tests/ui_device_matrix.md`
+- `tests/android_test_matrix.md`
+- `tests/final_qa_report.md`
+- `tests/release_checklist.md`
+- `docs/known_issues.md`
+- `docs/user_guide_vi.md`
+
+Reports must be reconciled to the final source commit and APK hash.
+
+## 9. Verification Status
+
+| Check | Current Status |
+|---|---|
+| Android foundation and branding | Implemented |
+| Previous Debug APK preparation | Leader reported |
+| PC Sound Settings F5 | PASS, Leader reported |
+| PC Back/Escape F5 | PASS, Leader reported |
+| Final level and visual polish | Planned |
+| Final APK export | NOT RUN |
+| Final APK physical-device regression | NOT RUN |
+| Final release QA approval | BLOCKED |
+
+Previous Android reports may be used as historical evidence but must not be presented as verified final-build results without matching source and APK identities.
+
+## 10. Final Release Gate
+
+The Leader may approve the release only when:
+- Source and documentation are synchronized.
+- Relevant F6 and F5 checks pass.
+- The final APK is installed and tested on physical Android hardware.
+- All five levels have valid, verified solutions.
+- UI, Back, audio, save, and offline requirements pass.
+- No unresolved blocker remains.
+- The final QA matrix and checklist are complete.
+- The source SHA, APK SHA-256, and release artifact match.
+
+Until these conditions are satisfied, Sprint 05 final release acceptance remains pending.

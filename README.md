@@ -1,127 +1,233 @@
-# Echo Loop — Mobile Puzzle Game
+# Echo Loop — 2D Time-Loop Puzzle Game
 
-Đồ án thực tế Công nghệ phần mềm — Nhóm 5 sinh viên, UTH.
+Echo Loop is a 2D top-down, grid-based puzzle game developed with Godot 4.7.2 and GDScript. It is a university software engineering project built by a five-member student team, targeting offline Android gameplay.
 
-> **Trạng thái:** Skeleton v0.1.1. Mới có Main Menu, Gameplay placeholder và điều hướng. **Chưa có** Player, Time Loop, hệ thống màn chơi, Save hay Tutorial.
+## Project Status
 
-## Yêu cầu
-- Godot 4.x **Standard / GDScript**, sử dụng cùng phiên bản Godot với nhóm trưởng.
-- Windows 11 (máy phát triển); đầu ra dự kiến: APK Android.
-- Không cần Firebase, máy chủ, Android Studio để chạy thử F5 trên PC. Android SDK + JDK chỉ phục vụ xuất APK.
+**Current phase:** Sprint 05 — Android QA, final polish, and release preparation.
 
-## Mở và chạy thử
-1. Clone repository (GitHub Desktop → File → Clone repository). **Không** clone đè vào thư mục đang có project.
-2. Godot Project Manager → Import → chọn file `project.godot` trong thư mục vừa clone.
-3. Mở project, đợi Godot import tài nguyên.
-4. Nhấn **F5**: Main Menu xuất hiện; chọn **New Game** → Gameplay Test → **Back to Menu**.
-5. Nhấn **F6** chỉ chạy scene đang mở.
-6. Nếu lỗi, gửi ảnh tab Debugger/Output và ảnh cây Scene cho leader; đừng tự đổi tên node/path.
+Implemented in the integrated source:
+- Five playable puzzle levels.
+- Player movement on a grid.
+- A deterministic 12-tick time-loop system.
+- Up to two Echo actors replaying recorded actions.
+- Pressure switches, linked doors, and exit portals.
+- Main Menu, Level Select, Tutorial, HUD, Pause, and Level Complete screens.
+- Local level-unlock and sound-preference persistence.
+- Sound ON/OFF control in Main Menu.
+- Back navigation for menu and gameplay screens.
+- Updated HUD styling and Android branding.
 
-## Cấu trúc hiện có — KHÔNG di chuyển/đổi tên
+The Leader has reported passing PC F5 tests for Sound Settings, Back navigation using Escape, and related gameplay regression.
+
+**Release status:** Not yet approved. Final Android QA, level balancing, visual polish, and final APK verification remain pending.
+
+## Technical Requirements
+
+- Godot 4.7.2 stable, Standard/GDScript.
+- GL Compatibility renderer.
+- Landscape-oriented Android target.
+- Android SDK, JDK, and matching export templates for APK builds.
+- Git and GitHub for source control.
+- No server, Firebase, or internet connection required for gameplay.
+
+## Getting Started
+
+1. Clone the repository into a new directory.
+2. Open Godot 4.7.2 Project Manager.
+3. Import the repository's `project.godot`.
+4. Wait for the initial resource import.
+5. Press F5 to start from Main Menu.
+6. Select New Game to enter Level 01.
+7. Use F6 to run a selected test scene independently.
+8. Inspect Output and Debugger for parser or runtime errors.
+
+Use Ctrl+S after editing scripts, scenes, or resources and before running tests.
+
+## Gameplay Rules
+
+- Actions: UP, DOWN, LEFT, RIGHT, WAIT.
+- Each loop contains exactly 12 ticks.
+- WAIT consumes one tick.
+- A blocked movement consumes one tick without changing position.
+- Ending a loop early pads its recorded history with WAIT.
+- A maximum of two Echoes can exist.
+- Echoes replay previously recorded action histories.
+- Player and Echo actors may occupy the same grid cell.
+- Actors use the door-state snapshot captured at the beginning of a tick.
+- Actor movement is resolved before switches and doors update.
+- Linked doors open only when all required switches are activated.
+- Only the current Player can complete a level at Exit.
+- The run fails after the third loop if the Player has not won.
+- Restart resets the current run and its Echo histories.
+
+The order of tick processing is part of the gameplay contract and must not be changed without an approved design decision.
+
+## Levels
+
+| Level | Name | Main Concept |
+|---|---|---|
+| 01 | First Step | Basic movement and Exit |
+| 02 | Hold the Door | One Echo holds a switch |
+| 03 | Echo Memory | Synchronization and WAIT |
+| 04 | Two Paths | Coordinated routes |
+| 05 | Double Echo | Two Echoes and two-switch AND logic |
+
+The game currently targets five levels. Difficulty and visuals may be refined later, but each modified puzzle must retain a documented valid solution.
+
+Level resources are stored in `data/levels/`.
+
+## User Interface
+
+Main Menu:
+- New Game
+- Continue
+- How to play
+- Sound: ON/OFF
+- Exit
+
+Continue opens Level Select; it does not restore an unfinished tick or run.
+
+Gameplay HUD:
+- LEVEL, TICK, LOOP, ECHO
+- Four-direction D-pad
+- WAIT, ENDLOOP, RESTART
+- Pause control
+
+Other screens:
+- Tutorial
+- Level Select
+- Pause Menu
+- Level Complete
+
+### Back Navigation
+
+| Screen | Back Action |
+|---|---|
+| Main Menu | Exit application |
+| Tutorial | Return to Main Menu |
+| Level Select | Return to Main Menu |
+| Gameplay | Open Pause Menu |
+| Pause Menu | Resume gameplay |
+| Level Complete | Open Level Select |
+
+PC Escape navigation was tested by the Leader. Physical Android Back behavior still requires final APK verification.
+
+## Save and Audio
+
+The local save system stores:
+- `unlocked_level`
+- `sound_enabled`
+
+It does not store:
+- The current tick or loop
+- Player or Echo positions
+- Echo action histories
+- An unfinished gameplay run
+
+Sound settings can be changed in Main Menu and are persisted through the existing GameManager and SaveManager APIs.
+
+## Repository Structure
+
 ```text
 project.godot
-scenes/menus/main_menu.tscn
-scenes/gameplay/gameplay.tscn
-scripts/core/main_menu.gd
-scripts/core/gameplay.gd
+scenes/
+  menus/
+  gameplay/
+  player/
+  puzzle/
+  ui/
+  tests/
+scripts/
+  core/
+  timeloop/
+  player/
+  puzzle/
+  ui/
+  data/
+assets/
+  sprites/
+  audio/
+  fonts/
+  branding/
+data/
+  levels/
+docs/
+tests/
 ```
-Đây là các đường dẫn đã được nhóm trưởng dùng trong Skeleton. Các thư mục khác sẽ tạo dần khi có Issue tương ứng.
 
-## Cây thư mục chuẩn cho các phần tiếp theo
-```text
-scenes/menus/       # TV4: scene menu hiện có; các menu mới
-scenes/gameplay/    # Leader: Gameplay trung tâm; hạn chế sửa
-scenes/player/      # TV2: Player / Echo visual
-scenes/puzzle/      # TV3: công tắc/cửa/đích
-scenes/ui/          # TV4: HUD / Pause / Tutorial / LevelSelect
-scenes/tests/       # các scene F6 thử module
-scripts/core/       # Leader: điều hướng, turn, time loop, điều phối
-scripts/player/     # TV2: Player và Echo visual
-scripts/puzzle/     # TV3: puzzle logic
-scripts/ui/         # TV4: UI
-scripts/data/       # TV5: lưu/đọc dữ liệu
-assets/sprites/     # TV2/TV3/TV5 phối hợp
-assets/audio/       # TV5
-assets/fonts/       # TV4
-data/levels/        # TV3
-docs/               # tài liệu
-tests/              # test cases / script kiểm thử
-```
-Các thư mục chưa có file có thể không xuất hiện sau clone vì Git không lưu thư mục rỗng.
+This is a logical directory overview. Git does not preserve empty directories.
 
-## Luật gameplay bất biến (bản thiết kế 1.0)
-- Grid top-down; action: `UP`, `DOWN`, `LEFT`, `RIGHT`, `WAIT`.
-- Mỗi vòng 12 tick; bị chặn vẫn tiêu tốn tick; kết thúc sớm đệm `WAIT`.
-- Tối đa 2 Echo; mỗi vòng reset vị trí và môi trường nhưng giữ lịch sử hành động của Echo.
-- Xét cửa theo trạng thái **đầu tick**, di chuyển các nhân vật, sau đó cập nhật switch/door và kiểm tra thắng.
-- Player có thể đi xuyên Echo. Chỉ Player tới EXIT mới thắng.
-- MVP: 5 màn có lời giải; thêm màn nếu đủ thời gian.
+## Team Responsibilities
 
-## Quy ước làm việc
-- Chưa được tự tạo/sửa GameManager, TurnManager, TimeLoopManager hoặc đổi API công khai nếu chưa có Issue và hợp đồng được leader phê duyệt.
-- Trước khi code: đọc `docs/` (sổ tay 1.1, gameplay TXT, UML), Issue và module contract.
-- Mỗi Issue → branch ngắn `feature/EL-XX-ten-tinh-nang` → tự test bằng F6/F5 → push → Pull Request.
-- Không tự sửa `project.godot`, `scenes/gameplay/gameplay.tscn`, `scripts/core/` hoặc file của người khác nếu chưa thống nhất.
-- PR phải ghi các file sửa, cách kiểm thử, kết quả, ảnh/video, rủi ro và phụ thuộc.
-- `main` luôn chạy F5 từ menu tới Gameplay. Merge từng PR, không gom 4 nhánh cùng lúc.
+| Role | Responsibility |
+|---|---|
+| Leader | Game Core, Time Loop, integration, release configuration, final QA approval |
+| TV2 | Player, Echo, actor visuals, movement QA |
+| TV3 | Puzzle mechanics, level resources, puzzle QA |
+| TV4 | HUD, menus, tutorial, Android UI QA |
+| TV5 | Save, Audio, test reports, release documentation |
 
-## Đóng góp và bảo mật
-- Không đưa `*.keystore`, mật khẩu, credential, file APK build và thư mục `.godot/` vào Git.
-- Đồ án dùng Godot offline; Firebase không nằm trong phạm vi.
-- Liên hệ leader trên kênh nhóm khi gặp lệch kiến trúc hoặc API chưa tồn tại.
+Changes to shared Core, Gameplay, or project configuration files require Leader review.
 
----
+## Development Workflow
 
-## Cap nhat Sprint 04 - Tich hop 5 level
+1. Update the working branch from the approved main baseline.
+2. Read the relevant Issue and `docs/module_contract.md`.
+3. Modify only the approved file scope.
+4. Save changed resources and scripts.
+5. Run relevant F6 tests and F5 regression.
+6. Record actual test results and evidence.
+7. Commit only intended files.
+8. Push a feature branch and open a Pull Request.
+9. Review changes and merge one PR at a time.
+10. Repeat relevant regression tests after integration.
 
-**Phien ban phat trien:** Godot 4.7.2 / GDScript.
-**Pham vi:** Leader Integration - Issue #21.
+Never treat an unexecuted test as PASS.
 
-Ghi chu: Thong tin Skeleton v0.1.1 o dau README la lich su
-du an, khong con phan anh day du trang thai hien tai.
+## Test and Release Documentation
 
-### Gameplay da tich hop
+- `docs/module_contract.md`
+- `docs/android_export_guide.md`
+- `docs/user_guide_vi.md`
+- `docs/known_issues.md`
+- `tests/android_actor_qa.md`
+- `tests/android_levels_qa.md`
+- `tests/android_ui_qa.md`
+- `tests/ui_device_matrix.md`
+- `tests/android_test_matrix.md`
+- `tests/final_qa_report.md`
+- `tests/release_checklist.md`
 
-- Nap Level 01-05 qua `LevelManager`.
-- Player, Echo, switch, door va Exit trong Gameplay.
-- HUD hien thi Level, Tick, Loop va so Echo.
-- Level Select kiem tra quyen mo khoa qua SaveManager.
-- Thang man hien Level Complete.
-- Next Level chi chuyen khi nguoi choi bam nut.
-- Replay khoi tao lai luot choi va xoa Echo run cu.
-- Pause / Resume / Restart / Main Menu.
-- Save luu tien trinh mo khoa va tuy chon am thanh.
+The Vietnamese user guide is a separate deliverable. This README and the two technical documents updated with it are maintained in English.
 
-### Chay thu
+## Release Acceptance
 
-1. Mo `project.godot` bang Godot 4.7.2.
-2. Nhan F5 de vao Main Menu.
-3. Chon New Game de choi Level 01.
-4. Chon Continue de mo Level Select.
-5. Hoan thanh man de mo khoa man tiep theo.
-6. Su dung Pause de tam dung va Resume de choi tiep.
+Sprint 05 can only be accepted after:
+- Final source integration and regression.
+- Updated solutions for all changed levels.
+- Final APK export from a recorded source commit.
+- Physical Android install and launch.
+- Five-level end-to-end gameplay verification.
+- Touch UI, Back, pause, save, and audio checks.
+- Offline operation and close/reopen verification.
+- Device, OS, tester, APK SHA-256, and evidence recorded.
+- No unresolved release-blocking defects.
+- Leader approval of the final QA report.
 
-### Kiem thu Sprint 04
+PC F5 success or an earlier Debug APK does not establish final release approval.
 
-- `scenes/tests/sprint_04_flow_test.tscn`
-- `scenes/tests/sprint_03_core_test.tscn`
-- `scenes/tests/echo_test.tscn`
-- `scenes/tests/puzzle_tick_test.tscn`
-- `scenes/tests/levels_validation_test.tscn`
+## Security
 
-Leader da bao cao cac buoc F5/F6 tich hop PASS.
-Ket qua chi tiet va bang chung can duoc dinh kem trong PR.
-Viec nghiem thu Sprint 04 cuoi cung phu thuoc regression/QA
-va review PR, khong chi dua tren viec game mo duoc.
+Never commit:
+- APK/AAB build outputs
+- Keystores and signing passwords
+- Private keys or credentials
+- The `.godot/` import/cache directory
+- Local private test data
 
-### Quy uoc source
+Signing configuration is maintained outside version control.
 
-- Game Core: `scripts/core/`
-- Gameplay scene: `scenes/gameplay/gameplay.tscn`
-- Level Resources: `data/levels/`
-- UI scenes: `scenes/ui/`
-- SaveManager: `scripts/data/save_manager.gd`
-- Test scripts: `tests/`
+## Historical Note
 
-Khong thay doi luat 12 tick, toi da 2 Echo
-hoac thu tu xu ly door snapshot.
+The original Skeleton v0.1.1 and Sprint 02–04 records describe earlier milestones. The current source and approved module contract take precedence over those historical descriptions.

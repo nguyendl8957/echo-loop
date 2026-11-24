@@ -1,295 +1,237 @@
 # Echo Loop — Module Integration Contract
 
-**Phiên bản:** 0.1 — Sprint 02  
-**Phụ trách:** Leader — Game Core & Integration  
-**Phạm vi:** Level 01 không Echo, Godot 4.7.2, GDScript  
-**Trạng thái:** Chờ kiểm thử tích hợp và nghiệm thu
+**Version:** Sprint 05 integration baseline  
+**Engine:** Godot 4.7.2 stable  
+**Language:** GDScript  
+**Owner:** Leader — Game Core and Integration  
+**Status:** Integrated source contract; final Android release acceptance pending
 
-## 1. Quy tắc gameplay bất biến
+This document describes the public interfaces, ownership boundaries, and gameplay invariants used by the integrated five-level game. For implementation details, the approved repository source is authoritative.
 
-- Mỗi Time Loop có tối đa 12 tick.
-- Tối đa 2 Echo được tạo từ lịch sử các vòng trước.
-- Các action hợp lệ: `UP`, `DOWN`, `LEFT`, `RIGHT`, `WAIT`.
-- `WAIT` và hành động di chuyển bị chặn đều tiêu tốn một tick.
-- Kết thúc vòng sớm phải đệm các action còn thiếu bằng `WAIT`.
-- Trạng thái cửa được chụp tại đầu tick; mọi actor sử dụng cùng trạng thái đó để kiểm tra di chuyển.
-- Sau khi tất cả actor di chuyển mới cập nhật switch, door và điều kiện thắng.
-- Chỉ Player hiện tại được kích hoạt chiến thắng tại Exit.
-- Player và Echo có thể đứng trên cùng một ô.
-- Sprint 02 chưa tạo hoặc phát lại Echo. Phần gameplay này được tích hợp ở Sprint 03.
+## 1. Immutable Gameplay Rules
 
-## 2. Quy ước lưới
+- Each Time Loop contains exactly 12 ticks.
+- A maximum of two Echoes may replay earlier loops.
+- Supported actions are UP, DOWN, LEFT, RIGHT, and WAIT.
+- WAIT and blocked movement consume one tick.
+- Early End Loop pads remaining replay actions with WAIT.
+- Player and Echo actors may occupy the same grid cell.
+- All actors use the same beginning-of-tick door snapshot.
+- Actor movement occurs before switch and door updates.
+- Only the current Player can trigger Exit completion.
+- A run fails when the third loop is exhausted without victory.
+- Restart resets run state without deleting unlocked progress.
 
-- Kiểu tọa độ logic: `Vector2i`.
-- Kích thước một ô: `48 × 48` pixel.
-- Gốc tọa độ `(0, 0)` nằm ở góc trên bên trái bản đồ.
-- Tọa độ tăng sang phải theo trục X, xuống dưới theo trục Y.
-- Tâm hiển thị của ô `(x, y)` là `Vector2(x * 48 + 24, y * 48 + 24)`.
-- Một ô hợp lệ phải thỏa `0 <= x < grid_width` và `0 <= y < grid_height`.
+No visual, UI, or level-balancing change may silently modify these rules.
 
-Core chịu trách nhiệm cung cấp danh sách ô bị chặn cho Player, bao gồm tường, biên bản đồ và cửa đóng theo snapshot đầu tick.
+## 2. Tick Processing Order
 
-## 3. LevelData — hợp đồng dữ liệu màn chơi
+1. Capture the initial door and blocker states.
+2. Collect the current Player action and Echo replay actions.
+3. Validate movement against the initial snapshot.
+4. Resolve Player and Echo positions for the tick.
+5. Recalculate pressure-switch activation.
+6. Recalculate linked-door states.
+7. Check Player victory at Exit.
+8. Finalize the tick and synchronize the HUD and loop state.
 
-**Script:** `res://scripts/core/level_data.gd`  
-**Class:** `LevelData extends Resource`  
-**Owner:** Leader
+A door opened at the end of a tick cannot be entered retroactively during the same tick. An actor already occupying a door cell may leave even if that door closes.
 
-Các thuộc tính:
+TurnManager and TimeLoopManager own tick and loop state. Individual actors and HUD controls must not increment ticks independently.
 
-| Thuộc tính | Kiểu dữ liệu | Ý nghĩa |
+## 3. Grid Coordinate Contract
+
+- Logical coordinates use `Vector2i`.
+- Current cell size is 48 x 48 logical pixels.
+- Grid origin is the top-left corner.
+- X increases to the right; Y increases downward.
+- Cell center: `Vector2(x * 48 + 24, y * 48 + 24)`.
+- Valid cell bounds: `0 <= x < grid_width` and `0 <= y < grid_height`.
+
+Core supplies blocked cells, including walls, out-of-bounds targets, and closed doors from the tick snapshot.
+
+## 4. LevelData
+
+Script: `res://scripts/core/level_data.gd`  
+Class: `LevelData extends Resource`  
+Owner: Leader (schema), TV3 (level resources)
+
+Important fields:
+
+| Field | Type | Purpose |
 |---|---|---|
-| `level_id` | `int` | Mã màn chơi |
-| `level_name` | `String` | Tên màn chơi |
-| `grid_width` | `int` | Chiều rộng theo ô |
-| `grid_height` | `int` | Chiều cao theo ô |
-| `player_start` | `Vector2i` | Vị trí Player ban đầu |
-| `exit_position` | `Vector2i` | Vị trí Exit |
-| `wall_cells` | `Array[Vector2i]` | Các ô tường |
-| `switch_positions` | `Array[Vector2i]` | Vị trí công tắc |
-| `door_configs` | `Array[Dictionary]` | Dữ liệu cấu hình cửa |
+| `level_id` | `int` | Level identifier |
+| `level_name` | `String` | Level display name |
+| `grid_width` | `int` | Grid width |
+| `grid_height` | `int` | Grid height |
+| `player_start` | `Vector2i` | Starting position |
+| `exit_position` | `Vector2i` | Exit position |
+| `wall_cells` | `Array[Vector2i]` | Wall locations |
+| `switch_positions` | `Array[Vector2i]` | Switch locations |
+| `door_configs` | `Array[Dictionary]` | Door configurations |
 
-Các phương thức đã định nghĩa trong script Sprint 02:
-
+Methods:
 - `is_in_bounds(cell: Vector2i) -> bool`
 - `validate_level() -> PackedStringArray`
 
-`validate_level()` hiện kiểm tra các điều kiện dữ liệu cơ bản như kích thước, tọa độ Start/Exit, tường và vị trí công tắc. Chưa được coi là bộ kiểm tra đầy đủ cho `door_configs`.
+Door configurations used by the integrated Gameplay contain a `position` (`Vector2i`) and `switch_indices` (`Array` of integer switch indices). Each configured door requires one or two valid linked switches.
 
-**Quy ước ownership:**
+Level resource paths:
+- `res://data/levels/level_01.tres`
+- `res://data/levels/level_02.tres`
+- `res://data/levels/level_03.tres`
+- `res://data/levels/level_04.tres`
+- `res://data/levels/level_05.tres`
 
-- Leader tạo và duy trì schema `level_data.gd`.
-- TV3 tạo và duy trì `res://data/levels/level_01.tres`.
-- TV3 không tự đổi tên hoặc kiểu thuộc tính schema.
-- Leader không tự sửa dữ liệu Level 01 thuộc TV3.
+Changing the LevelData schema requires Leader approval and regression testing.
 
-**Lưu ý:** Cấu trúc từng Dictionary trong `door_configs` chưa được phê duyệt. Trước khi thêm cửa vào dữ liệu màn chơi, Leader và TV3 phải thống nhất các khóa, kiểu dữ liệu và cách ánh xạ cửa–công tắc. Không tự giả định định dạng.
+## 5. LevelManager
 
-## 4. Player Controller — API hiện có
+Script: `res://scripts/core/level_manager.gd`
 
-**Script:** `res://scripts/player/player_controller.gd`  
-**Scene:** `res://scenes/player/player.tscn`  
-**Class:** `PlayerController`  
-**Owner:** TV2
+Public interface:
+- `LevelManager.MIN_LEVEL = 1`
+- `LevelManager.MAX_LEVEL = 5`
+- `LevelManager.load_level(level_id: int) -> LevelData`
 
-Phương thức:
+Invalid or unavailable levels must not be loaded as playable levels. Completing Level 05 must not unlock Level 06.
 
+## 6. Player Controller
+
+Script: `res://scripts/player/player_controller.gd`  
+Scene: `res://scenes/player/player.tscn`  
+Class: `PlayerController`  
+Owner: TV2
+
+Public methods:
 - `reset_position(start_cell: Vector2i) -> void`
 - `apply_action(action: String, blocked_cells: Array[Vector2i]) -> bool`
 
-Quy ước:
+State:
+- `grid_position: Vector2i`
 
-- `grid_position` lưu vị trí logic.
-- `apply_action()` chỉ xử lý vị trí Player.
-- Kết quả `true` nghĩa là Player đã đổi ô.
-- Kết quả `false` nghĩa là Player không đổi ô; có thể do `WAIT`, ô bị chặn hoặc action không hợp lệ.
-- Core phải phân biệt action hợp lệ và không hợp lệ trước khi gọi Player.
-- Player không tự quản lý tick, Echo hoặc trạng thái cửa.
+`apply_action()` returns true when the Player changes cells and false when no movement occurs. A false return does not mean a valid WAIT or blocked action should be refunded a tick.
 
-## 5. Puzzle — API hiện có
+The Player Controller does not own the game clock, switch updates, or Echo histories.
 
-**PressureSwitch**
+## 7. Echo Controller
+
+Script: `res://scripts/player/echo_controller.gd`  
+Scene: `res://scenes/player/echo.tscn`  
+Owner: TV2
+
+Gameplay creates Echo instances from recorded histories and supplies the starting position, action history, and visual tint.
+
+Relevant integration methods:
+- `setup_echo(start_cell, action_history, tint)`
+- `apply_echo_action(tick_index, blocked_cells)`
+
+Echo actors replay previously recorded actions. They do not read current Player input, increment ticks, or trigger victory at Exit.
+
+## 8. Puzzle Objects
+
+Owner: TV3
+
+### PressureSwitch
 
 Script: `res://scripts/puzzle/pressure_switch.gd`
 
+State:
 - `grid_position: Vector2i`
 - `is_active: bool`
+
+Methods:
 - `update_state(actor_positions: Array[Vector2i]) -> bool`
 - `reset_state() -> void`
 
-Công tắc kích hoạt khi có ít nhất một actor đứng trên ô của nó.
+A switch is active while at least one actor occupies its cell.
 
-**Door**
+### Door
 
 Script: `res://scripts/puzzle/door.gd`
 
+State:
 - `grid_position: Vector2i`
 - `linked_switches: Array[PressureSwitch]`
 - `is_open: bool`
+
+Methods:
 - `evaluate_state() -> bool`
 - `can_enter() -> bool`
 - `is_blocking() -> bool`
+- `is_blocking_for_tick(snapshot_is_open)`
 - `reset_state() -> void`
 
-Cửa mở khi tất cả công tắc liên kết đang kích hoạt; cửa không có công tắc liên kết mặc định đóng.
+A linked door opens only when all required switches are active. Core must evaluate entry using the beginning-of-tick snapshot.
 
-Việc kiểm tra đường đi trong tick phải sử dụng trạng thái cửa đã chụp ở đầu tick, không sử dụng trạng thái vừa được cập nhật trong cùng tick.
+### ExitPortal
 
-**ExitPortal — API dự kiến từ PR #34**
+Script: `res://scripts/puzzle/exit_portal.gd`  
+Scene: `res://scenes/puzzle/exit_portal.tscn`
 
-- Scene: `res://scenes/puzzle/exit_portal.tscn`
-- Script: `res://scripts/puzzle/exit_portal.gd`
+Relevant methods:
 - `is_at(cell: Vector2i) -> bool`
 - `check_player_reached(player_grid_pos: Vector2i) -> bool`
-- Signal: `player_entered(grid_pos: Vector2i)`
 
-Các API ExitPortal chỉ được xem là chính thức sau khi PR #34 được review, kiểm thử và merge.
+Only the current Player's position is passed to the victory check.
 
-## 6. HUD — API hiện có
+## 9. TimeLoopManager and TurnManager
 
-**Script:** `res://scripts/ui/hud.gd`  
-**Scene:** `res://scenes/ui/hud.tscn`  
-**Owner:** TV4
+Time Loop script:
+`res://scripts/timeloop/time_loop_manager.gd`
 
-Signals:
-
-- `action_requested(action: String)`
-- `end_loop_requested`
-- `restart_requested`
-
-Phương thức:
-
-`update_hud(level: int, tick: int, max_tick: int, echo_count: int) -> void`
-
-Quy tắc:
-
-- HUD chỉ phát yêu cầu thao tác và hiển thị dữ liệu.
-- Game Core tiếp nhận signal, kiểm tra điều kiện và xử lý action.
-- HUD không trực tiếp gọi Player hoặc tăng tick.
-- Trong Gameplay Sprint 02, số Echo hiển thị là `0`.
-- Việc sử dụng nút End Loop trong màn chưa tích hợp Echo phải được Leader kiểm soát, không để tự tạo Echo ngoài phạm vi Sprint 02.
-
-## 7. Game Core và Time Loop
-
-**GameManager**
-
-`res://scripts/core/game_manager.gd`
-
-Đang được khai báo Autoload trong `project.godot`.
-
-**TurnManager**
-
+Turn script:
 `res://scripts/core/turn_manager.gd`
 
+Constants:
+- `TimeLoopManager.MAX_TICKS = 12`
+- `TimeLoopManager.MAX_ECHOES = 2`
+
+TurnManager methods:
 - `setup(loop_manager: TimeLoopManager) -> void`
 - `submit_player_action(action: String) -> void`
 - `end_current_loop() -> void`
 - `restart_run() -> void`
 
-Signals:
-
+Relevant signals:
 - `tick_actions_requested(...)`
 - `tick_finished(tick_number: int)`
 - `input_rejected(action: String)`
 
-**TimeLoopManager**
+Core must prevent concurrent or duplicated action processing. Input is locked when a run is finished or when the Gameplay controller requires it.
 
-`res://scripts/timeloop/time_loop_manager.gd`
+## 10. HUD Contract
 
-- `MAX_TICKS = 12`
-- `MAX_ECHOES = 2`
+Script: `res://scripts/ui/hud.gd`  
+Scene: `res://scenes/ui/hud.tscn`  
+Owner: TV4
 
-Game Core phải đảm bảo mô phỏng thế giới hoàn tất trước khi HUD và các hệ thống phụ thuộc nhận thông báo tick đã xử lý xong. Việc thay đổi giao thức `tick_finished` phải được kiểm thử, không chỉnh sửa chỉ dựa trên giả định về signal.
+Signals:
+- `action_requested(action: String)`
+- `end_loop_requested`
+- `restart_requested`
 
-## 8. Thứ tự xử lý một tick
+Methods:
+- `update_hud(level, tick, max_tick, echo_count) -> void`
+- `update_loop_status(loop_number, echo_count, is_finished) -> void`
+- `set_input_locked(locked) -> void`
 
-1. Ghi nhận trạng thái cửa tại đầu tick.
-2. Thu thập và kiểm tra action hợp lệ của các actor hiện hành.
-3. Xác định các ô có thể di chuyển theo snapshot cửa.
-4. Áp dụng di chuyển.
-5. Cập nhật trạng thái công tắc từ vị trí actor.
-6. Tính lại trạng thái cửa.
-7. Kiểm tra chiến thắng của Player.
-8. Hoàn tất tick và đồng bộ HUD.
+HUD responsibilities:
+- Display LEVEL, TICK, LOOP, and ECHO.
+- Emit input requests.
+- Present directional, WAIT, ENDLOOP, and RESTART controls.
+- Reflect disabled and pressed states.
+- Remain usable in Android landscape mode.
 
-Ở Sprint 02 chỉ có Player. Giao thức vẫn phải cho phép bổ sung Echo trong Sprint 03 mà không thay đổi luật xử lý.
+HUD must not independently execute turns, control Player movement, or change Time Loop state.
 
-## 9. SaveManager — API hiện có
+## 11. GameManager
 
-**Script:** `res://scripts/data/save_manager.gd`  
-**Owner:** TV5
+Script: `res://scripts/core/game_manager.gd`  
+Autoload: `GameManager`  
+Owner: Leader
 
-`SaveManager` hiện kế thừa `RefCounted`, không phải Autoload và không khai báo `class_name`.
-
-Core phải nạp script trước khi khởi tạo instance, ví dụ thông qua `preload()`.
-
-Các phương thức:
-
-- `load_progress() -> Dictionary`
-- `save_progress(data: Dictionary) -> bool`
-- `reset_progress() -> bool`
-
-Dữ liệu lưu:
-
-- `unlocked_level`
-- `sound_enabled`
-
-Không lưu tick, lịch sử Echo, vị trí Player hoặc trạng thái đang chơi dở.
-
-## 10. Phân chia trách nhiệm tích hợp
-
-| Thành viên | Phạm vi chính |
-|---|---|
-| Leader | `scripts/core/`, `scripts/timeloop/`, Gameplay scene, hợp đồng module |
-| TV2 | `scripts/player/`, `scenes/player/` |
-| TV3 | `scripts/puzzle/`, `scenes/puzzle/`, `data/levels/` |
-| TV4 | `scripts/ui/`, `scenes/ui/` |
-| TV5 | `scripts/data/`, `assets/audio/`, tài liệu QA/test được phân công |
-
-Các thay đổi trên file dùng chung cần được Leader thống nhất trước. Mỗi PR chỉ chỉnh sửa các file thuộc phạm vi Issue.
-
-## 11. Điều kiện nghiệm thu Sprint 02
-
-- Resource Level 01 nạp được bằng hệ thống Resource của Godot.
-- Main Menu mở được Gameplay Level 01.
-- Player di chuyển đúng trên lưới 48px.
-- `WAIT` và hành động bị chặn tiêu tốn đúng một tick.
-- Tường, biên bản đồ và cửa đóng chặn đúng theo logic.
-- Trạng thái switch/door được cập nhật sau khi di chuyển.
-- Player đến Exit được xác nhận thắng.
-- HUD cập nhật Level, Tick và Echo đúng.
-- Restart đưa các thành phần về trạng thái ban đầu.
-- SaveManager không làm mất tùy chọn âm thanh khi cập nhật tiến trình.
-- Các module không gây lỗi khi chạy F6/F5.
-
-**Ghi chú kiểm thử:** Level 01 trong PR #34 hiện chưa chứa switch và door. Vì vậy kiểm thử cửa/công tắc cần fixture độc lập hoặc dữ liệu Level 01 được TV3 điều chỉnh theo yêu cầu nghiệm thu. Không được coi riêng đường giải Level 01 là bằng chứng đã kiểm tra logic cửa.
-
-**Trạng thái nghiệm thu:** Chưa xác nhận PASS. Chỉ cập nhật sau khi Leader kiểm thử trên code và commit thực tế.
-
-### HUD Sprint 03 — Approved API
-
-- `update_hud(level, tick, max_tick, echo_count)`:
-  Cập nhật Level, Tick và số Echo theo định dạng x/2.
-- `update_loop_status(loop_number, echo_count, is_finished)`:
-  Cập nhật vòng hiện tại, số Echo và trạng thái khóa input.
-- `set_input_locked(locked)`:
-  Khóa/mở D-pad, WAIT và End Loop.
-  Restart vẫn được phép sử dụng.
-
-Core quyết định khi nào khóa hoặc mở input.
-`is_finished = true` nghĩa là Gameplay tạm thời hoặc
-vĩnh viễn không nhận action, không phải tự động báo thắng.
-Sau khi chuyển sang vòng mới, Core phải mở khóa input.
-
----
-
-## 12. Sprint 04 - Leader Integration Contract (Issue #21)
-
-**Trang thai:** Da tich hop tren branch feature/EL-S04-L;
-cho review PR va nghiem thu regression cuoi cung.
-**Godot:** 4.7.2.
-**Owner:** Leader.
-
-### 12.1 LevelManager
-
-Script: `res://scripts/core/level_manager.gd`
-
-- `LevelManager.MIN_LEVEL = 1`
-- `LevelManager.MAX_LEVEL = 5`
-- `LevelManager.load_level(level_id: int) -> LevelData`
-
-LevelManager nap LevelData tu:
-`res://data/levels/level_01.tres` den `level_05.tres`.
-
-Du lieu khong hop le hoac level nam ngoai 1-5
-phai duoc tu choi, khong tu tao level moi.
-
-### 12.2 GameManager
-
-Autoload: `GameManager`.
-
-Public API duoc Gameplay/UI su dung:
-
+Navigation and progress methods:
 - `start_new_game() -> void`
 - `open_gameplay() -> void`
 - `back_to_menu() -> void`
@@ -299,16 +241,62 @@ Public API duoc Gameplay/UI su dung:
 - `select_level(level_id: int) -> bool`
 - `open_level_select() -> void`
 
-GameManager giu `current_level` va dieu huong scene.
-`complete_level()` chi xu ly mot lan cho moi lan choi
-va cap nhat `unlocked_level` qua SaveManager.
+Audio preference methods:
+- `is_sound_enabled() -> bool`
+- `set_sound_enabled(enabled: bool) -> bool`
 
-So level mo khoa duoc gioi han trong khoang 1-5.
-Thang Level 05 khong duoc mo khoa Level 06.
+GameManager manages level progression, navigation, audio initialization, and persistence integration. It does not change the established actor movement or door-snapshot rules.
 
-### 12.3 Level Select - TV4
+`complete_level()` must only apply once for a single completed run and must preserve unrelated save preferences.
 
-Scene: `res://scenes/ui/level_select.tscn`
+## 12. SaveManager and Audio
+
+SaveManager script:
+`res://scripts/data/save_manager.gd`
+
+AudioManager script:
+`res://scripts/data/audio_manager.gd`
+
+Owner: TV5
+
+SaveManager is instantiated from its script; it is not a separate Autoload.
+
+Methods:
+- `load_progress() -> Dictionary`
+- `save_progress(data: Dictionary) -> bool`
+- `reset_progress() -> bool`
+
+Persisted data:
+- `unlocked_level`
+- `sound_enabled`
+
+Not persisted:
+- Current Player position
+- Tick or loop in progress
+- Echo histories
+- Unfinished run state
+
+Main Menu SoundButton calls GameManager to change the saved sound preference. Audio behavior must follow that preference.
+
+## 13. UI Navigation Contract
+
+### Main Menu
+
+Scene: `res://scenes/menus/main_menu.tscn`  
+Script: `res://scripts/core/main_menu.gd`
+
+Controls:
+- New Game
+- Continue
+- How to play
+- Sound: ON/OFF
+- Exit
+
+Continue opens Level Select. It does not restore an unfinished run.
+
+### Level Select
+
+Scene: `res://scenes/ui/level_select.tscn`  
 Script: `res://scripts/ui/level_select.gd`
 
 Signals:
@@ -318,10 +306,9 @@ Signals:
 Method:
 - `set_unlocked_levels(unlocked_count: int) -> void`
 
-GameManager ket noi signal va ap dung quyen truy cap.
-Level Select khong tu thay doi Save.
+Locked levels must not be selectable.
 
-### 12.4 Level Complete - TV4
+### Level Complete
 
 Scene: `res://scenes/ui/level_complete.tscn`
 
@@ -333,11 +320,9 @@ Signals:
 Method:
 - `set_completed_level(level_id: int) -> void`
 
-Gameplay hien Level Complete khi Player den Exit.
-Next khong tu dong chay; phai co yeu cau cua nguoi choi.
-Tai Level 05, nut Next bi vo hieu hoa.
+Next Level requires explicit Player input. Level 05 must not advance to Level 06.
 
-### 12.5 Pause Menu - TV4
+### Pause Menu
 
 Scene: `res://scenes/ui/pause_menu.tscn`
 
@@ -346,51 +331,82 @@ Signals:
 - `pause_restart_requested`
 - `pause_menu_requested`
 
-Gameplay dieu khien trang thai Pause.
-Trong khi Pause, khong ghi action va khong ket thuc loop.
-Resume khong tu tang tick.
-Restart nap lai current level, xoa run va Echo cu.
-Menu quay ve Main Menu.
+Gameplay owns the pause state. Pause must not consume ticks or append replay actions. Restart begins a fresh run.
 
-Co che hien tai khoa input gameplay;
-khong su dung `SceneTree.paused` de dung toan bo scene.
+## 14. Back Navigation
 
-### 12.6 SaveManager - TV5
+The integrated source defines:
 
-Script: `res://scripts/data/save_manager.gd`
+| Screen | Back Behavior |
+|---|---|
+| Main Menu | Exit |
+| Tutorial | Return to Main Menu |
+| Level Select | Return to Main Menu |
+| Gameplay | Open Pause |
+| Pause Menu | Resume Gameplay |
+| Level Complete | Open Level Select |
 
-Core tao instance tu script preload,
-khong them SaveManager vao Autoload.
+Android Back is handled through `NOTIFICATION_WM_GO_BACK_REQUEST`. PC Escape is used for desktop navigation regression.
 
-Du lieu luu:
-- `unlocked_level`
-- `sound_enabled`
+Automatic quit on Android Back is disabled in project settings. Physical-device behavior remains subject to final Android QA.
 
-Khong luu tick, vi tri Player, Echo histories
-hoac trang thai dang choi do.
+## 15. Source Ownership
 
-### 12.7 Gameplay invariant
+| Role | Owned Scope |
+|---|---|
+| Leader | `scripts/core/`, `scripts/timeloop/`, central Gameplay, integration contract, release configuration |
+| TV2 | `scripts/player/`, `scenes/player/`, actor visuals |
+| TV3 | `scripts/puzzle/`, `scenes/puzzle/`, `data/levels/` |
+| TV4 | `scripts/ui/`, `scenes/ui/`, UI test documentation |
+| TV5 | `scripts/data/`, audio, assigned QA and release reports |
 
-- Moi Time Loop co 12 tick.
-- Toi da 2 Echo.
-- Action bi chan va WAIT van tieu ton tick.
-- End Loop som dem WAIT.
-- Moi actor dung door snapshot dau tick.
-- Player va Echo di chuyen truoc khi cap nhat switch/door.
-- Chi Player hien tai duoc kich hoat Exit.
-- Player va Echo co the trung o.
+Shared API and ownership changes require review. Tests and documentation must reference the actual commit used.
 
-### 12.8 Dieu kien nghiem thu
+## 16. Testing and Integration Gates
 
-- Level 01-05 nap dung Resource.
-- Level Select ton trong unlocked_level.
-- Next / Replay / Level Select hoat dong.
-- Pause khong lam tang tick.
-- Restart xoa Echo run hien tai.
-- Save ton tai sau khi khoi dong lai game.
-- Level 05 khong mo khoa Level 06.
-- F6 regression khong co FAIL.
-- F5 qua it nhat hai man lien tiep khong crash.
+### Source and PC verification
 
-Ket qua test, anh chup va cac han che con lai
-can ghi trong PR Issue #21.
+- Clean project import.
+- Relevant F6 module tests.
+- F5 Main Menu and Gameplay smoke tests.
+- Five-level data validation.
+- Tick, WAIT, blocked movement, and Echo replay regression.
+- Door snapshot and switch/door state verification.
+- Pause, Restart, and Level Complete navigation.
+- Level unlock and Save/Load verification.
+- Sound ON/OFF persistence.
+- Escape navigation and Back behavior.
+- No new parser or runtime errors.
+
+### Android release verification
+
+- Exported APK linked to an exact source commit.
+- APK SHA-256 recorded.
+- Real Android device and OS recorded.
+- Five levels completed on the final build.
+- Touch input, Back, orientation, and UI layout tested.
+- Offline, background/resume, and reopen behavior tested.
+- Save and sound preferences verified.
+- No unresolved blocking defects.
+- Final QA report and Leader approval.
+
+Leader-reported PC tests are recorded as PC results, not physical Android acceptance.
+
+## 17. Future Level and Visual Polish
+
+Subsequent changes may refine level difficulty, environment graphics, sprites, and user experience.
+
+Such work must:
+- Preserve immutable gameplay rules.
+- Preserve public module interfaces unless separately approved.
+- Update documented action sequences and expected outcomes for changed levels.
+- Re-run affected F6/F5 tests.
+- Rebuild and re-test the final Android APK if runtime or packaged assets change.
+
+## 18. Release State
+
+Sprint 05 source integration and documentation are in progress toward final acceptance.
+
+The project must not be declared fully released until its final source, APK, physical-device tests, evidence, and QA approvals are consistent.
+
+Earlier Sprint 02–04 design and implementation records remain available in Git history and historical project documents.
