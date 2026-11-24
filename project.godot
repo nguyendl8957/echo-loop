@@ -12,6 +12,7 @@ config_version=5
 
 config/name="EchoLoop"
 run/main_scene="uid://cpx8e7eys1snm"
+config/quit_on_go_back=false
 config/features=PackedStringArray("4.7", "GL Compatibility")
 boot_splash/bg_color=Color(0.003921569, 0.039215688, 0.16470589, 1)
 boot_splash/stretch_mode=2
