@@ -820,21 +820,35 @@ func _on_pause_menu_requested() -> void:
 
 
 # ============================================================
-# KEYBOARD: ESC TOGGLE PAUSE
+# ANDROID BACK / PC ESCAPE
 # ============================================================
 
-func _unhandled_key_input(
-	event: InputEvent
-) -> void:
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		_handle_back()
+
+
+func _input(event: InputEvent) -> void:
+	if OS.has_feature("android"):
+		return
+
 	if event is InputEventKey:
 		if event.pressed and not event.echo:
 			if event.keycode == KEY_ESCAPE:
-				if result_ui.visible:
-					return
-
-				if is_paused:
-					_close_pause()
-				else:
-					_open_pause()
-
+				_handle_back()
 				get_viewport().set_input_as_handled()
+
+
+func _handle_back() -> void:
+	# Khi thang, tro ve Level Select.
+	if result_ui.visible:
+		_on_result_level_select_requested()
+		return
+
+	# Khi Pause, quay lai Gameplay.
+	if is_paused:
+		_close_pause()
+		return
+
+	# Khi dang choi, mo Pause Menu.
+	_open_pause()

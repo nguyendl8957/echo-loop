@@ -34,3 +34,23 @@ func set_unlocked_levels(unlocked_count: int) -> void:
 
 	for i in range(buttons.size()):
 		buttons[i].disabled = i >= unlocked_count
+
+# Android Back / PC Escape
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		_handle_back()
+
+
+func _input(event: InputEvent) -> void:
+	if OS.has_feature("android"):
+		return
+
+	if event is InputEventKey:
+		if event.pressed and not event.echo:
+			if event.keycode == KEY_ESCAPE:
+				_handle_back()
+				get_viewport().set_input_as_handled()
+
+
+func _handle_back() -> void:
+	GameManager.back_to_menu()

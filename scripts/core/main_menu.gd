@@ -16,6 +16,10 @@ const TUTORIAL_SCENE: PackedScene = preload(
 	$CenterContainer/MenuContent/TutorialButton
 )
 
+@onready var sound_button: Button = (
+	$CenterContainer/MenuContent/SoundButton
+)
+
 @onready var exit_button: Button = (
 	$CenterContainer/MenuContent/ExitButton
 )
@@ -36,12 +40,40 @@ func _ready() -> void:
 		_on_tutorial_pressed
 	)
 
+	sound_button.pressed.connect(
+		_on_sound_pressed
+	)
+
 	exit_button.pressed.connect(
 		_on_exit_pressed
 	)
 
 	continue_button.disabled = false
 	tutorial_button.disabled = false
+
+	_update_sound_button()
+
+
+func _update_sound_button() -> void:
+	if GameManager.is_sound_enabled():
+		sound_button.text = "Sound: ON"
+	else:
+		sound_button.text = "Sound: OFF"
+
+
+func _on_sound_pressed() -> void:
+	var new_state: bool = (
+		not GameManager.is_sound_enabled()
+	)
+
+	var saved: bool = GameManager.set_sound_enabled(
+		new_state
+	)
+
+	if not saved:
+		push_warning("Cannot save sound preference.")
+
+	_update_sound_button()
 
 
 func _on_new_game_pressed() -> void:
@@ -81,3 +113,27 @@ func _on_tutorial_back_requested() -> void:
 
 func _on_exit_pressed() -> void:
 	get_tree().quit()
+	
+
+# Android Back / PC Escape
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		_handle_back()
+
+
+func _input(event: InputEvent) -> void:
+	if OS.has_feature("android"):
+		return
+
+	if event is InputEventKey:
+		if event.pressed and not event.echo:
+			if event.keycode == KEY_ESCAPE:
+				_handle_back()
+				get_viewport().set_input_as_handled()
+
+
+func _handle_back() -> void:
+	if is_instance_valid(tutorial_instance):
+		_on_tutorial_back_requested()
+	else:
+		get_tree().quit()
