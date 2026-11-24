@@ -1,10 +1,69 @@
 # Echo Loop — 2D Time-Loop Puzzle Game
 
+**A sci-fi puzzle adventure where your past actions become your greatest allies.**
+
+![Godot](https://img.shields.io/badge/Godot-4.7.2-478CBF?logo=godotengine&logoColor=white)
+![Platform](https://img.shields.io/badge/Platform-Android-green)
+![Release](https://img.shields.io/badge/Release-v1.0.0-blue)
+![Status](https://img.shields.io/badge/Status-Released-brightgreen)
+
+Echo Loop is a 2D top-down puzzle game developed with Godot 4.7.2 and GDScript by a five-member Software Engineering student team.
+
+Record your actions across time loops, cooperate with your past selves, activate pressure plates, and unlock the exit before time runs out.
+
+## Download Echo Loop
+
+**Version 1.0.0 — Android Release APK**
+
+[**Download APK (Google Drive)**](https://drive.google.com/file/d/1iarFzLn8ydw5haG9LYywCWPuOHcgVKuI/view?usp=sharing)
+
+[**View GitHub Release v1.0.0**](https://github.com/nguyendl8957/echo-loop/releases/tag/v1.0.0)
+
+### Scan to Download
+
+![Echo Loop Download QR](docs/images/echo-loop-qr.png)
+
+Scan this QR code using your Android phone to open the APK download page.
+
+### Installation
+
+1. Download `EchoLoop.apk`.
+2. Open the downloaded APK on your Android device.
+3. Allow installation from the selected source if Android prompts you.
+4. Install and launch Echo Loop.
+
+The game supports offline play. Version 1.0.0 was manually tested on Google Pixel 10; compatibility with other devices is not fully verified.
+
+## Game Screenshots
+
+| Main Menu | How to Play |
+|:---:|:---:|
+| ![Main Menu](docs/images/main-menu.png) | ![Tutorial](docs/images/how-to-play.png) |
+
+| Level Selection | Gameplay |
+|:---:|:---:|
+| ![Level Select](docs/images/level-select.png) | ![Gameplay](docs/images/gameplay.png) |
+
+## Core Features
+
+- **Time Loop:** Plan actions within 12 ticks per loop.
+- **Echo Replay:** Create up to two Echoes that replay previous actions.
+- **Puzzle Mechanics:** Coordinate pressure plates, doors, and timed movement.
+- **Five Levels:** Progress from your first Echo to complex temporal puzzles.
+- **WAIT Action:** Synchronize movements and switch activation across timelines.
+- **Sci-Fi Interface:** Futuristic laboratory visuals and responsive touch controls.
+- **Local Progress:** Save unlocked levels and sound preferences.
+- **Offline Gameplay:** No account or internet connection required.
+
+---
+
+
+
 Echo Loop is a 2D top-down, grid-based puzzle game developed with Godot 4.7.2 and GDScript. It is a university software engineering project built by a five-member student team, targeting offline Android gameplay.
 
 ## Project Status
 
-**Current phase:** Final polish after the Sprint 05 integration baseline.
+**Current phase:** v1.0.0 released. Sprint 05 implementation and Leader-reported Android QA completed.
 
 Implemented in the integrated source:
 - Five playable puzzle levels.
@@ -20,7 +79,7 @@ Implemented in the integrated source:
 
 The Leader has reported passing PC F5 tests for Sound Settings, Back navigation using Escape, and related gameplay regression.
 
-**Release status:** Desktop verification is recorded in the [QA report](tests/final_qa_report.md). Final Android build and device verification remain pending.
+**Release status:** Signed Android APK v1.0.0 published. Leader-reported Android acceptance and remaining verification limitations are recorded in the [QA report](tests/final_qa_report.md).
 
 ## Technical Requirements
 
@@ -111,7 +170,7 @@ Other screens:
 | Pause Menu | Resume gameplay |
 | Level Complete | Open Level Select |
 
-PC Escape navigation was tested by the Leader. Physical Android Back behavior still requires final APK verification.
+PC Escape and Android Back navigation were manually tested by the Leader.
 
 ## Save and Audio
 
