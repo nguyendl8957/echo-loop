@@ -213,3 +213,80 @@ Gate chỉ được nâng lên khi:
 
 **Báo cáo này là bản nháp dựa trên source ZIP và tài liệu nhóm ngày 2026-11-23. Không phải chứng nhận APK đã qua QA.**
 
+
+---
+
+# Sprint 05 — Final Android Release Candidate Acceptance
+
+Date: 2026-11-24
+Reviewer: Project Leader
+Engine: Godot 4.7.2 stable
+
+## Release Candidate
+
+- Source baseline: b9dd99e61f5e93d3e018d1f752ba658bca20210d
+- APK: EchoLoop.apk
+- Package: com.dangnguyen.echoloop
+- Version: 1.0.0 (code 1)
+- APK SHA-256: 57e6f134e9bb16ed1d7cf1a788943790fd89c0ece0af3eccee918c9e2e8ecf64
+- Test device: Google Pixel 10
+- Android version: Not independently recorded
+- APK signing certificate comparison: Pending documented verification
+
+The source baseline is the reported export baseline. The APK
+hash identifies the exact package tested.
+
+## Leader-Reported Android Acceptance
+
+| Test group | Result |
+|---|---|
+| APK installation and launch | PASS |
+| Launcher icon and landscape layout | PASS |
+| D-pad and action buttons | PASS |
+| Levels 01-05 completion | PASS |
+| Echo replay, switches and doors | PASS |
+| Pause, resume and Android Back | PASS |
+| Save and sound preferences | PASS |
+| Offline and background/resume | PASS |
+| UI inspection | PASS |
+| Overall manual acceptance checklist | PASS |
+
+All results above are reported by the Project Leader
+from the final APK test session. They are not a claim
+that every individual historical QA matrix case was rerun.
+
+## Evidence
+
+Four interface screenshots were provided for review:
+Main Menu, How to Play, Level Select and Gameplay.
+
+Their capture environment is not independently verified.
+They may be reused for the README, but must not be labeled
+as physical-device screenshots without confirmation.
+
+## Independent Playtesting
+
+Status: NOT RUN.
+
+Project Leader accepts this as an exception to the
+original Level QA acceptance criteria due to the
+submission deadline.
+
+This exception does not count as a PASS result.
+
+## Outstanding Verification
+
+- Exact Android OS version/API level
+- Documented APK signing-certificate comparison
+- Individual historical test cases not covered by
+  the Leader's reported final acceptance session
+- Tester sign-off from other module owners
+
+## Release Decision
+
+Final manual Android testing: PASS, Leader reported.
+
+Release documentation reconciliation: IN PROGRESS.
+
+Final release gate: Pending confirmation of signing,
+remaining evidence and Leader approval.
