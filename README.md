@@ -4,7 +4,7 @@ Echo Loop is a 2D top-down, grid-based puzzle game developed with Godot 4.7.2 an
 
 ## Project Status
 
-**Current phase:** Sprint 05 — Android QA, final polish, and release preparation.
+**Current phase:** Final polish after the Sprint 05 integration baseline.
 
 Implemented in the integrated source:
 - Five playable puzzle levels.
@@ -20,7 +20,7 @@ Implemented in the integrated source:
 
 The Leader has reported passing PC F5 tests for Sound Settings, Back navigation using Escape, and related gameplay regression.
 
-**Release status:** Not yet approved. Final Android QA, level balancing, visual polish, and final APK verification remain pending.
+**Release status:** Desktop verification is recorded in the [QA report](tests/final_qa_report.md). Final Android build and device verification remain pending.
 
 ## Technical Requirements
 
@@ -65,17 +65,17 @@ The order of tick processing is part of the gameplay contract and must not be ch
 
 ## Levels
 
-| Level | Name | Main Concept |
-|---|---|---|
-| 01 | First Step | Basic movement and Exit |
-| 02 | Hold the Door | One Echo holds a switch |
-| 03 | Echo Memory | Synchronization and WAIT |
-| 04 | Two Paths | Coordinated routes |
-| 05 | Double Echo | Two Echoes and two-switch AND logic |
+| Level | Name | Main Concept | Minimum Echoes |
+|---|---|---|---:|
+| 01 | The First Memory | Record a route to a pressure plate | 1 |
+| 02 | Dual Protocol | Hold two plates simultaneously | 2 |
+| 03 | Memory Relay | Use Echo 1 to open the route for Echo 2 | 2 |
+| 04 | The Waiting Game | Time a handoff between adjacent plates | 2 |
+| 05 | Temporal Paradox | Combine a relay and a handoff within 12 ticks | 2 |
 
 The game currently targets five levels. Difficulty and visuals may be refined later, but each modified puzzle must retain a documented valid solution.
 
-Level resources are stored in `data/levels/`.
+Level resources are stored in `data/levels/`. See [Level Design V2 solutions](tests/level_design_v2.md) for routes and tick traces.
 
 ## User Interface
 
@@ -91,8 +91,8 @@ Continue opens Level Select; it does not restore an unfinished tick or run.
 Gameplay HUD:
 - LEVEL, TICK, LOOP, ECHO
 - Four-direction D-pad
-- WAIT, ENDLOOP, RESTART
-- Pause control
+- WAIT, END LOOP, RESTART
+- Pause icon at the top right
 
 Other screens:
 - Tutorial

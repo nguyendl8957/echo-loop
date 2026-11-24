@@ -1,4 +1,71 @@
-# S05-TV5 — Final QA Report
+# Echo Loop — QA bản Final Polish
+
+Kiểm tra trên Windows bằng Godot `4.7.2.stable.official.ed1daf0bf`. Nhánh `feature/EL-FINAL-polish` tại baseline `5aed183`. Mọi lượt kiểm tra có ghi Save dùng hồ sơ riêng để bảo toàn tiến trình chơi hiện có. [Lời giải 5 màn và bảng trạng thái từng tick](level_design_v2.md)
+
+## Kết quả thực thi
+
+| Bài kiểm tra | Kết quả |
+|---|---|
+| Import và khởi động main scene | Import thành công. Main Menu tải từ cấu hình project. |
+| `levels_validation_test` | 39 PASS, 0 FAIL. Lời giải thắng ở các tick 6, 9, 10, 11, 12. Bộ duyệt kiểm tra giới hạn Echo và kiểm tra 9 lối qua cửa. |
+| `level_01_test` | PASS. Pressure plate, liên kết cửa và Exit đúng dữ liệu. |
+| `core_test`, `sprint_02_turn_test`, `sprint_03_core_test` | Lần lượt 26, 12 và 43 PASS, 0 FAIL. |
+| `puzzle_test`, `puzzle_tick_test`, `replay_regression_test` | Lần lượt 31, 34 và 20 PASS, 0 FAIL. Replay cho cùng một trace trong 10 lần chạy. |
+| `hud_test`, `hud_loop_test`, `hud_integration_test`, `sprint_04_flow_test` | HUD đạt 8 kiểm tra, các nhóm HUD loop và tích hợp đạt, flow đạt 25 kiểm tra. |
+| `player_integration_test`, `actor_visual_test` | Lần lượt 31 và 17 PASS, 0 FAIL. |
+| Windows GUI, 1280×720 và 960×540 | Mỗi kích thước đạt 40 PASS, 0 FAIL, cộng kiểm tra Back cuối và Exit. Chuột chạy lời giải cả 5 màn qua D-pad, kiểm tra WAIT, END LOOP, RESTART, Pause/Resume, Back/Esc, Unlock, Next, Replay và Sound. |
+| `save_flow_test` trong phiên GUI | 16 PASS, 0 FAIL cho Save/Audio và 10 PASS, 0 FAIL cho dữ liệu level. Hai trường hợp fixture bỏ qua được thực thi qua GameManager trong lượt GUI, gồm Replay giữ mốc unlock và thắng Level 05 vẫn lưu tối đa 05. |
+| Android, APK cuối | NOT RUN. Cần kiểm thử cảm ứng, vùng an toàn, Back vật lý, âm thanh, hiệu năng và chạy ngoại tuyến trên thiết bị từ APK của bản này. |
+
+Godot chạy các scene test trực tiếp ở chế độ headless. Ví dụ lệnh PowerShell từ thư mục gốc dự án.
+
+```powershell
+$godot = 'D:/ADMIN/Godot_v4.7.2-stable_win64_console.exe'
+& $godot --headless --path . --editor --import
+& $godot --headless --path . --scene res://scenes/tests/levels_validation_test.tscn --quit-after 120
+& $godot --headless --path . --scene res://scenes/tests/sprint_03_core_test.tscn --quit-after 80
+& $godot --headless --path . --scene res://scenes/tests/puzzle_tick_test.tscn --quit-after 80
+& $godot --headless --path . --scene res://scenes/tests/replay_regression_test.tscn --quit-after 80
+```
+
+Đổi đường dẫn sau `--scene` để chạy các scene test khác trong `scenes/tests/`. Bài GUI dùng cùng engine với trình kết xuất Compatibility và gửi click chuột tới các Button thật.
+
+## Giải thích thuật toán khi vấn đáp
+
+1. `TurnManager.submit_player_action()` kiểm tra action, lấy action Echo theo chỉ số tick, ghi action Player rồi phát signal để `Gameplay` xử lý tick.
+2. `Gameplay` lấy tường và trạng thái cửa trước khi bất kỳ actor nào di chuyển. Player và Echo cùng dùng snapshot này để kiểm tra ô đích. WAIT và lệnh bị tường chặn vẫn đã được ghi, nên tick vẫn tính.
+3. Sau khi mọi actor di chuyển, `PressureSwitch` xét ô nào đang có actor. `Door` mở khi mọi công tắc liên kết đều hoạt động. Cửa vừa mở có thể vào từ tick kế tiếp. Actor đứng trong ô cửa vẫn được đi ra nếu ô đích hợp lệ.
+4. Chỉ tọa độ Player được so với Exit để kết thúc màn. Sau đó TurnManager phát `tick_finished` để HUD hiển thị số tick, loop và Echo hiện có.
+5. Ở vòng 1 và 2, `TimeLoopManager.end_loop()` đệm WAIT tới 12 và lưu một bản sao action. `Gameplay` đưa các actor về Start và reset Switch/Door. Echo được tạo theo mỗi bản ghi, đọc đúng action của tick rồi kiểm tra va chạm của thế giới hiện tại.
+6. Khi hết vòng 3, game khóa lượt nếu Player chưa thắng. Restart tải lại màn và chỉ reset run. Level 04–05 dùng WAIT để canh lúc một Echo chuyển công tắc. Việc đứng yên đúng nhịp có thể đạt bằng WAIT hoặc bằng hành động di chuyển bị chặn.
+
+## Những file được sửa
+
+| Nhóm | File | Mục đích |
+|---|---|---|
+| Puzzle | `data/levels/level_01.tres` đến `level_05.tres` | Năm bản đồ 13×9 dùng cấu trúc LevelData hiện có. |
+| Hiển thị Gameplay | `scripts/core/gameplay.gd`, `scenes/gameplay/gameplay.tscn`, `scripts/player/echo_controller.gd`, `scenes/player/player.tscn` | Dựng lớp hiển thị, căn bản đồ, nhãn liên kết cửa, dấu Player, vòng sáng và vệt Echo. |
+| Giao diện | `scenes/menus/main_menu.tscn`, `scenes/ui/{tutorial,level_select,hud,pause_menu,level_complete}.tscn`, `scripts/ui/{level_select,hud,level_complete}.gd` | Dùng chung theme, cải thiện menu, HUD và lớp phủ. Xử lý Esc ở Level Select trước khi đổi scene để viewport còn hợp lệ. |
+| Thêm mới | `scripts/core/lab_board.gd` và UID, `scenes/ui/lab_theme.tres`, `assets/sprites/environment/lab_background.png`, `assets/sprites/lab_controls.png`, `assets/fonts/Oxanium.ttf` và giấy phép OFL, metadata import cho ba asset | Một lớp hiển thị dùng cho mọi bản đồ, một theme, một ảnh nền, một atlas icon và một font ngoại tuyến. |
+| Test và tài liệu | `tests/{levels_validation_test,replay_regression_test}.gd`, `scenes/tests/level_01_test.gd`, README, hướng dẫn tiếng Việt, báo cáo QA, tài liệu lời giải Sprint 03–05 và lời giải V2 | Phát lại hành động qua Gameplay, kiểm tra số Echo, kiểm tra cửa bắt buộc và đánh dấu tài liệu lịch sử. Fixture replay dùng scene Switch/Door/Exit để cung cấp đúng node Sprite2D. |
+
+So với ảnh demo, bản Windows có lab navy với console ở hai bên, sàn và khung kim loại, top HUD, Pause ở góc phải, D-pad trái và ba nút hành động phải. Player dùng sprite gốc và có dấu tam giác. Cổng tím dùng sprite xoáy gốc trong khung sáng của một ô. Thiết kế dùng màu và dáng actor hiện có, nền lab riêng và bản đồ khác nhau theo cơ chế từng màn.
+
+Ảnh nền lab được tạo riêng cho game. Font được đóng gói cùng giấy phép OFL để hiển thị ngoại tuyến. [Nguồn font Oxanium](https://github.com/google/fonts/tree/main/ofl/oxanium)
+
+`TurnManager`, `TimeLoopManager`, `GameManager`, cấu trúc Save và cấu hình Android/branding dùng nguyên bản baseline. Các nút tiếp tục phát signal cũ. Tệp import và UID có từ trước được đối chiếu hash.
+
+## Kiểm tra trong editor và trên điện thoại
+
+1. Mở `project.godot` bằng Godot 4.7.2 Standard. Đợi import và nhấn **F5** để vào Main Menu theo cấu hình dự án.
+2. Chọn **How to play** rồi **Back**. Chọn **Continue** và kiểm tra thẻ khóa theo tiến trình hiện tại.
+3. Chọn **New Game**. Thử WAIT, Pause/Esc, Resume và Restart. Chơi Level 01 theo lời giải V2, rồi đi tiếp qua **Next Level**.
+4. Mở `scenes/tests/levels_validation_test.tscn`, nhấn **F6** và xem dòng `LEVELS VALIDATION: 39 PASS / 0 FAIL` trong Output. Dùng F6 cho `sprint_03_core_test.tscn` và `puzzle_tick_test.tscn` để xem các kiểm tra snapshot riêng.
+5. Từ APK của bản polish, thử các thao tác trên điện thoại landscape. Xác minh vùng chạm cạnh màn hình, Back vật lý, âm thanh sau khi khởi động lại và lưu tiến trình trong chế độ offline. Dùng lời giải từng tick để phát lại Level 04–05.
+
+---
+
+## Báo cáo Sprint 05 trước đợt polish
 
 **DRAFT — NOT RELEASE APPROVAL**
 

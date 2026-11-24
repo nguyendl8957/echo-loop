@@ -33,7 +33,11 @@ func set_unlocked_levels(unlocked_count: int) -> void:
 	]
 
 	for i in range(buttons.size()):
-		buttons[i].disabled = i >= unlocked_count
+		var level := LevelManager.load_level(i + 1)
+		buttons[i].disabled = i >= unlocked_count or level == null
+		var title := level.level_name if level != null else "Unavailable"
+		var status := "LOCKED" if buttons[i].disabled else "READY"
+		buttons[i].text = "LEVEL %02d\n\n%s\n\n%s" % [i + 1, title, status]
 
 # Android Back / PC Escape
 func _notification(what: int) -> void:
@@ -48,8 +52,8 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey:
 		if event.pressed and not event.echo:
 			if event.keycode == KEY_ESCAPE:
-				_handle_back()
 				get_viewport().set_input_as_handled()
+				_handle_back()
 
 
 func _handle_back() -> void:

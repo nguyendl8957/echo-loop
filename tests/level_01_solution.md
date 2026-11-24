@@ -1,5 +1,7 @@
 # Level 01 — Solution Record (S03-TV5)
 
+Historical Sprint 03 record. See [Level Design V2](level_design_v2.md) for the current Level 01.
+
 **Issue:** #20  
 **Owner:** TV5 (verification and evidence only)  
 **Source baseline:** `main` commit `86f573b` from the supplied project ZIP  

@@ -1,70 +1,488 @@
 [gd_scene format=3 uid="uid://crrnuxrlpwp16"]
 
-[ext_resource type="Script" uid="uid://b2e1wgh1xy0mi" path="res://scripts/ui/tutorial.gd" id="1_k8r76"]
+[ext_resource type="Script" path="res://scripts/ui/tutorial.gd" id="script"]
+[ext_resource type="Theme" path="res://scenes/ui/lab_theme.tres" id="theme"]
+[ext_resource type="Texture2D" path="res://assets/sprites/environment/lab_background.png" id="bg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lab_controls.png" id="icons"]
+
+[sub_resource type="AtlasTexture" id="Move"]
+atlas = ExtResource("icons")
+region = Rect2(0, 0, 32, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Wait"]
+atlas = ExtResource("icons")
+region = Rect2(128, 0, 32, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Loop"]
+atlas = ExtResource("icons")
+region = Rect2(160, 0, 32, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Echo"]
+atlas = ExtResource("icons")
+region = Rect2(256, 0, 32, 32)
+filter_clip = true
 
 [node name="Tutorial" type="Control" unique_id=236486026]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("1_k8r76")
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+script = ExtResource("script")
+theme = ExtResource("theme")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1273159958]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.0627451, 0.09411765, 0.15294118, 1)
+[node name="Background" type="TextureRect" parent="."]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+mouse_filter = 2
+texture = ExtResource("bg")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="TitleLabel" type="Label" parent="." unique_id=1462621099]
-layout_mode = 1
-anchors_preset = 5
+[node name="Shade" type="ColorRect" parent="."]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.0275, 0.0510, 0.0980, 0.6157)
+
+[node name="TitleLabel" type="Label" parent="."]
+theme_type_variation = &"Heading"
 anchor_left = 0.5
+anchor_top = 0
 anchor_right = 0.5
-offset_left = -135.0
-offset_top = 60.0
-offset_right = 135.0
-offset_bottom = 115.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(0.21960784, 0.8509804, 0.9019608, 1)
+anchor_bottom = 0
+offset_left = -420.0
+offset_top = 38.0
+offset_right = 420.0
+offset_bottom = 108.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.8941, 0.9608, 1.0000, 1)
 theme_override_font_sizes/font_size = 48
 text = "HOW TO PLAY"
 horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="InstructionLabel" type="Label" parent="." unique_id=715120350]
-custom_minimum_size = Vector2(800, 0)
-layout_mode = 0
-offset_left = 250.0
-offset_top = 36.0
-offset_right = 1050.0
-offset_bottom = 645.0
-theme_override_font_sizes/font_size = 22
-text = "
-MOVE:
-Use the arrow buttons to move your character.
-WAIT:
-Stay in place for one tick.
-TIME LOOP:
-Each loop lasts up to 12 ticks.
-ECHO:
-Your previous actions will be replayed by an Echo.
-SWITCH & DOOR:
-Activate switches to open doors.
-GOAL:
-Reach the exit to complete the level."
+[node name="Summary" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0
+anchor_right = 0.5
+anchor_bottom = 0
+offset_left = -490.0
+offset_top = 106.0
+offset_right = 490.0
+offset_bottom = 140.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.6745, 0.7490, 0.8471, 1)
+theme_override_font_sizes/font_size = 20
+text = "Record your actions, then solve the room alongside your Echoes."
 horizontal_alignment = 1
 vertical_alignment = 1
-autowrap_mode = 2
 
-[node name="BackButton" type="Button" parent="." unique_id=1278698490]
-layout_mode = 0
-offset_left = 540.0
-offset_top = 620.0
-offset_right = 740.0
-offset_bottom = 675.0
+[node name="MoveFrame" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 0
+anchor_right = 0.5
+anchor_bottom = 0
+offset_left = -433.0
+offset_top = 166.0
+offset_right = -12.0
+offset_bottom = 270.0
+mouse_filter = 2
+
+[node name="Symbol" type="TextureRect" parent="MoveFrame"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 48.0
+offset_bottom = 44.0
+mouse_filter = 2
+texture = SubResource("Move")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Heading" type="Label" parent="MoveFrame"]
+theme_type_variation = &"Heading"
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 59.0
+offset_top = 7.0
+offset_right = 420.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4706, 0.9137, 1.0000, 1)
 theme_override_font_sizes/font_size = 20
-text = "BACK"
+text = "MOVE"
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="MoveFrame"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 59.0
+offset_top = 43.0
+offset_right = 410.0
+offset_bottom = 92.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7647, 0.8314, 0.9020, 1)
+theme_override_font_sizes/font_size = 16
+text = "Use the D-pad. A move into a wall or a closed\ndoor still uses one tick."
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="WaitFrame" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 0
+anchor_right = 0.5
+anchor_bottom = 0
+offset_left = 12.0
+offset_top = 166.0
+offset_right = 433.0
+offset_bottom = 270.0
+mouse_filter = 2
+
+[node name="Symbol" type="TextureRect" parent="WaitFrame"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 48.0
+offset_bottom = 44.0
+mouse_filter = 2
+texture = SubResource("Wait")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Heading" type="Label" parent="WaitFrame"]
+theme_type_variation = &"Heading"
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 59.0
+offset_top = 7.0
+offset_right = 420.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4706, 0.9137, 1.0000, 1)
+theme_override_font_sizes/font_size = 20
+text = "WAIT"
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="WaitFrame"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 59.0
+offset_top = 43.0
+offset_right = 410.0
+offset_bottom = 92.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7647, 0.8314, 0.9020, 1)
+theme_override_font_sizes/font_size = 16
+text = "Stay on your tile for one tick. Use WAIT to\nhold a plate or line up with an Echo."
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="LoopFrame" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 0
+anchor_right = 0.5
+anchor_bottom = 0
+offset_left = -433.0
+offset_top = 288.0
+offset_right = -12.0
+offset_bottom = 392.0
+mouse_filter = 2
+
+[node name="Symbol" type="TextureRect" parent="LoopFrame"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 48.0
+offset_bottom = 44.0
+mouse_filter = 2
+texture = SubResource("Loop")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Heading" type="Label" parent="LoopFrame"]
+theme_type_variation = &"Heading"
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 59.0
+offset_top = 7.0
+offset_right = 420.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4706, 0.9137, 1.0000, 1)
+theme_override_font_sizes/font_size = 20
+text = "END LOOP"
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="LoopFrame"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 59.0
+offset_top = 43.0
+offset_right = 410.0
+offset_bottom = 92.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7647, 0.8314, 0.9020, 1)
+theme_override_font_sizes/font_size = 16
+text = "Each loop lasts 12 ticks. End it early to fill\nthe remaining ticks with WAIT."
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="EchoFrame" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 0
+anchor_right = 0.5
+anchor_bottom = 0
+offset_left = 12.0
+offset_top = 288.0
+offset_right = 433.0
+offset_bottom = 392.0
+mouse_filter = 2
+
+[node name="Symbol" type="TextureRect" parent="EchoFrame"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 48.0
+offset_bottom = 44.0
+mouse_filter = 2
+texture = SubResource("Echo")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Heading" type="Label" parent="EchoFrame"]
+theme_type_variation = &"Heading"
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 59.0
+offset_top = 7.0
+offset_right = 420.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4706, 0.9137, 1.0000, 1)
+theme_override_font_sizes/font_size = 20
+text = "ECHO"
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="EchoFrame"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 59.0
+offset_top = 43.0
+offset_right = 410.0
+offset_bottom = 92.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7647, 0.8314, 0.9020, 1)
+theme_override_font_sizes/font_size = 16
+text = "Recording a loop creates one Echo, up to two.\nEach Echo replays its actions from the start."
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="CircuitFrame" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 0
+anchor_right = 0.5
+anchor_bottom = 0
+offset_left = -433.0
+offset_top = 410.0
+offset_right = -12.0
+offset_bottom = 514.0
+mouse_filter = 2
+
+[node name="Symbol" type="Label" parent="CircuitFrame"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 49.0
+offset_bottom = 44.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4706, 0.9137, 1.0000, 1)
+theme_override_font_sizes/font_size = 16
+text = "A+B"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Heading" type="Label" parent="CircuitFrame"]
+theme_type_variation = &"Heading"
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 59.0
+offset_top = 7.0
+offset_right = 420.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4706, 0.9137, 1.0000, 1)
+theme_override_font_sizes/font_size = 20
+text = "PLATES & DOORS"
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="CircuitFrame"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 59.0
+offset_top = 43.0
+offset_right = 410.0
+offset_bottom = 92.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7647, 0.8314, 0.9020, 1)
+theme_override_font_sizes/font_size = 16
+text = "Stand on the plates shown on a door. It can\nbe entered from the next tick."
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="GoalFrame" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 0
+anchor_right = 0.5
+anchor_bottom = 0
+offset_left = 12.0
+offset_top = 410.0
+offset_right = 433.0
+offset_bottom = 514.0
+mouse_filter = 2
+
+[node name="Symbol" type="Label" parent="GoalFrame"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 49.0
+offset_bottom = 44.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7922, 0.6039, 1.0000, 1)
+theme_override_font_sizes/font_size = 16
+text = "◆"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Heading" type="Label" parent="GoalFrame"]
+theme_type_variation = &"Heading"
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 59.0
+offset_top = 7.0
+offset_right = 420.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4706, 0.9137, 1.0000, 1)
+theme_override_font_sizes/font_size = 20
+text = "EXIT"
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="GoalFrame"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 59.0
+offset_top = 43.0
+offset_right = 410.0
+offset_bottom = 92.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7647, 0.8314, 0.9020, 1)
+theme_override_font_sizes/font_size = 16
+text = "Guide the current Player into the purple portal\nwithin three loops."
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="FirstRunHint" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 0
+anchor_right = 0.5
+anchor_bottom = 0
+offset_left = -433.0
+offset_top = 532.0
+offset_right = 433.0
+offset_bottom = 587.0
+mouse_filter = 2
+
+[node name="Text" type="Label" parent="FirstRunHint"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.8510, 0.9412, 1.0000, 1)
+theme_override_font_sizes/font_size = 17
+text = "IN LEVEL 01   |   Stand on A, then select END LOOP. Let your Echo stay on A while you use the door."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BackButton" type="Button" parent="."]
+anchor_left = 0.5
+anchor_top = 0
+anchor_right = 0.5
+anchor_bottom = 0
+offset_left = -94.0
+offset_top = 619.0
+offset_right = 94.0
+offset_bottom = 675.0
+mouse_default_cursor_shape = 2
+text = "❮  BACK"

@@ -1,5 +1,7 @@
 # Echo Loop — Hồ sơ Lời giải Chuẩn & Bằng chứng Kiểm thử 5 Màn chơi (Level 01–05)
 
+Hồ sơ Android của baseline Sprint 05. Xem [Level Design V2](../level_design_v2.md) để chạy bản đồ và lời giải của đợt polish.
+
 **Issue:** #28 (`S05-TV3 — QA đường giải và tile/object placement trên 5 màn Android`)  
 **Owner:** TV3 (Puzzle & Level)  
 **Source Baseline:** `main` commit `b1b48b0` (đã tích hợp đầy đủ Sprint 04 và cấu hình Android Sprint 05)  

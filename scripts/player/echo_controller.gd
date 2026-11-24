@@ -2,6 +2,7 @@ extends PlayerController
 class_name EchoController
 
 var _history := PackedStringArray()
+var _glow := Color.TRANSPARENT
 
 
 func setup_echo(
@@ -12,6 +13,13 @@ func setup_echo(
 	_history = history.duplicate()
 	reset_position(start_cell)
 	$Sprite2D.self_modulate = tint
+	_glow = Color("#ab83ff") if tint.r > 1.0 else Color("#72d7ff")
+	queue_redraw()
+
+
+func _draw() -> void:
+	draw_circle(Vector2(0, 5), 17, Color(_glow, 0.12))
+	draw_arc(Vector2(0, 5), 18, 0, TAU, 28, Color(_glow, 0.75), 1.5, true)
 
 
 func apply_echo_action(

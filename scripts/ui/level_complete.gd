@@ -14,7 +14,10 @@ func _ready() -> void:
 	level_select_button.pressed.connect(_on_level_select_pressed)
 
 func set_completed_level(level_id: int) -> void:
-	next_button.disabled = level_id >= 5
+	next_button.disabled = level_id >= LevelManager.MAX_LEVEL
+	$CompletePanel/VBoxContainer/Detail.text = (
+		"Final level cleared" if next_button.disabled else "Level %02d cleared" % level_id
+	)
 
 func _on_next_pressed() -> void:
 	result_next_requested.emit()

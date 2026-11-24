@@ -1,78 +1,146 @@
 [gd_scene format=3 uid="uid://bl2qs3hb5ymdx"]
 
-[ext_resource type="Script" uid="uid://dgd7tg8yjam00" path="res://scripts/ui/level_select.gd" id="1_x15a5"]
+[ext_resource type="Script" path="res://scripts/ui/level_select.gd" id="script"]
+[ext_resource type="Theme" path="res://scenes/ui/lab_theme.tres" id="theme"]
+[ext_resource type="Texture2D" path="res://assets/sprites/environment/lab_background.png" id="bg"]
 
 [node name="LevelSelect" type="Control" unique_id=960464531]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("1_x15a5")
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+script = ExtResource("script")
+theme = ExtResource("theme")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1955449735]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.20392157, 0.34509805, 0.64705884, 1)
+[node name="Background" type="TextureRect" parent="."]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+mouse_filter = 2
+texture = ExtResource("bg")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="LevelGrid" type="GridContainer" parent="." unique_id=992528863]
-layout_mode = 1
-anchors_preset = 8
+[node name="Shade" type="ColorRect" parent="."]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.0157, 0.0392, 0.0863, 0.5647)
+
+[node name="SelectionPanel" type="PanelContainer" parent="."]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -383.0
-offset_top = -35.0
-offset_right = 383.0
-offset_bottom = 35.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_left = -535.0
+offset_top = -222.0
+offset_right = 535.0
+offset_bottom = 166.0
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="."]
+theme_type_variation = &"Heading"
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -460.0
+offset_top = -178.0
+offset_right = 460.0
+offset_bottom = -102.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.8902, 0.9569, 1.0000, 1)
+theme_override_font_sizes/font_size = 47
+text = "SELECT LEVEL"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Instructions" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -450.0
+offset_top = -103.0
+offset_right = 450.0
+offset_bottom = -65.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.6588, 0.7529, 0.8588, 1)
+theme_override_font_sizes/font_size = 18
+text = "Complete a level to unlock the next."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LevelGrid" type="GridContainer" parent="." unique_id=992528863]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -483.0
+offset_top = -28.0
+offset_right = 483.0
+offset_bottom = 123.0
 columns = 5
+theme_override_constants/h_separation = 12
 
-[node name="Level01Button" type="Button" parent="LevelGrid" unique_id=1933244518]
-custom_minimum_size = Vector2(150, 70)
+[node name="Level01Button" type="Button" parent="LevelGrid"]
 layout_mode = 2
-text = "LEVEL 01"
+custom_minimum_size = Vector2(182, 142)
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 17
+text = ""
 
-[node name="Level02Button" type="Button" parent="LevelGrid" unique_id=810099533]
-custom_minimum_size = Vector2(150, 70)
+[node name="Level02Button" type="Button" parent="LevelGrid"]
 layout_mode = 2
-disabled = true
-text = "LEVEL 02"
+custom_minimum_size = Vector2(182, 142)
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 17
+text = ""
 
-[node name="Level03Button" type="Button" parent="LevelGrid" unique_id=829644898]
-custom_minimum_size = Vector2(150, 70)
+[node name="Level03Button" type="Button" parent="LevelGrid"]
 layout_mode = 2
-disabled = true
-text = "LEVEL 03"
+custom_minimum_size = Vector2(182, 142)
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 17
+text = ""
 
-[node name="Level04Button" type="Button" parent="LevelGrid" unique_id=1304060876]
-custom_minimum_size = Vector2(150, 70)
+[node name="Level04Button" type="Button" parent="LevelGrid"]
 layout_mode = 2
-disabled = true
-text = "LEVEL 04"
+custom_minimum_size = Vector2(182, 142)
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 17
+text = ""
 
-[node name="Level05Button" type="Button" parent="LevelGrid" unique_id=1995042339]
-custom_minimum_size = Vector2(150, 70)
+[node name="Level05Button" type="Button" parent="LevelGrid"]
 layout_mode = 2
-disabled = true
-text = "LEVEL 05"
+custom_minimum_size = Vector2(182, 142)
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 17
+text = ""
 
-[node name="BackButton" type="Button" parent="." unique_id=701653169]
-custom_minimum_size = Vector2(150, 60)
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = -80.0
-offset_right = 170.0
-offset_bottom = -20.0
-grow_vertical = 0
-text = "BACK"
+[node name="BackButton" type="Button" parent="."]
+anchor_left = 0
+anchor_top = 1
+anchor_right = 0
+anchor_bottom = 1
+offset_left = 28.0
+offset_top = -78.0
+offset_right = 176.0
+offset_bottom = -24.0
+mouse_default_cursor_shape = 2
+text = "❮  BACK"
