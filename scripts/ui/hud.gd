@@ -5,6 +5,16 @@ signal action_requested(action: String)
 signal end_loop_requested
 signal restart_requested
 
+const OBJECTIVES := [
+	"Stand on A, then choose END LOOP to record an Echo.",
+	"Hold both plates to open the exit route.",
+	"Use the first Echo to open a route to the second plate.",
+	"Time the A-to-B handoff while C stays held.",
+	"Relay to C, then time the handoff between A and B."
+]
+
+var level_name: String
+
 @onready var up_button: Button = $HUDRoot/ControlsArea/UpButton
 @onready var down_button: Button = $HUDRoot/ControlsArea/DownButton
 @onready var left_button: Button = $HUDRoot/ControlsArea/LeftButton
@@ -17,6 +27,7 @@ signal restart_requested
 @onready var tick_label: Label = $HUDRoot/TopBar/TickLabel
 @onready var echo_label: Label = $HUDRoot/TopBar/EchoLabel
 @onready var loop_label: Label = $HUDRoot/TopBar/LoopLabel
+@onready var objective: Label = $HUDRoot/TopBar/Objective
 
 
 func _ready() -> void:
@@ -45,6 +56,14 @@ func _on_restart_pressed() -> void:
 	print("Restart requested")
 
 
+func set_level_name(value: String) -> void:
+	level_name = value
+
+
+func show_run_failed() -> void:
+	objective.text = "All three loops used. Choose RESTART to try again."
+
+
 func update_hud(
 	level: int,
 	tick: int,
@@ -52,6 +71,11 @@ func update_hud(
 	echo_count: int
 ) -> void:
 	level_label.text = "LEVEL %02d" % level
+	if not level_name.is_empty():
+		level_label.text += "  /  " + level_name
+	objective.text = OBJECTIVES[level - 1] if level >= 1 and level <= OBJECTIVES.size() else ""
+	if level == 1 and echo_count > 0:
+		objective.text = "Let your Echo hold A while you head for the exit."
 	tick_label.text = "TICK: %d/%d" % [tick, max_tick]
 	echo_label.text = "ECHO: %d/2" % echo_count
 	

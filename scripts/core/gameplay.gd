@@ -38,6 +38,7 @@ const ECHO_SCENE: PackedScene = preload(
 )
 
 const CELL_SIZE: int = 48
+const LAB_THEME := preload("res://scenes/ui/lab_theme.tres")
 
 
 # ------------------------------------------------------------
@@ -50,7 +51,7 @@ const CELL_SIZE: int = 48
 	$LevelRoot/EchoContainer
 )
 
-@onready var walls_node: Node2D = $LevelRoot/Walls
+@onready var board = $LevelRoot/Walls
 
 @onready var objects_node: Node2D = (
 	$LevelRoot/InteractiveObjects
@@ -195,9 +196,12 @@ func _ready() -> void:
 	)
 
 	# 8. Tao ban do va vat the.
-	_create_walls()
+	board.level = level_data
+	_layout_board()
+	get_viewport().size_changed.connect(_layout_board)
 	_create_switches_and_doors()
 	_create_exit()
+	hud.set_level_name(level_data.level_name)
 
 	# 9. Ket noi Time Loop.
 	loop_manager.run_failed.connect(
@@ -216,22 +220,13 @@ func _ready() -> void:
 # LEVEL OBJECT CREATION
 # ============================================================
 
-func _create_walls() -> void:
-	for cell in level_data.wall_cells:
-		var wall := Polygon2D.new()
-
-		wall.color = Color(0.15, 0.35, 0.48)
-
-		wall.polygon = PackedVector2Array([
-			Vector2(0, 0),
-			Vector2(CELL_SIZE, 0),
-			Vector2(CELL_SIZE, CELL_SIZE),
-			Vector2(0, CELL_SIZE)
-		])
-
-		wall.position = Vector2(cell * CELL_SIZE)
-
-		walls_node.add_child(wall)
+func _layout_board() -> void:
+	var view := get_viewport_rect().size
+	var room := Vector2(level_data.grid_width, level_data.grid_height) * CELL_SIZE
+	var usable := Vector2(view.x * 0.61, view.y - 164.0)
+	var fit := minf(usable.x / room.x, usable.y / room.y)
+	$LevelRoot.scale = Vector2.ONE * fit
+	$LevelRoot.position = ((view - room * fit) * 0.5 + Vector2(0, 5)).round()
 
 
 func _create_exit() -> void:
@@ -244,6 +239,11 @@ func _create_exit() -> void:
 	exit_portal.grid_position = (
 		level_data.exit_position
 	)
+	var portal_sprite: Sprite2D = exit_portal.sprite_2d
+	portal_sprite.scale = Vector2.ONE * 1.08
+	var pulse := portal_sprite.create_tween().set_loops()
+	pulse.tween_property(portal_sprite, "self_modulate", Color(1.2, 1.12, 1.35), 0.8)
+	pulse.tween_property(portal_sprite, "self_modulate", Color.WHITE, 0.8)
 
 
 func _validate_door_configs() -> bool:
@@ -320,6 +320,8 @@ func _create_switches_and_doors() -> void:
 		objects_node.add_child(sw)
 
 		sw.grid_position = cell
+		var plate_id := String.chr(65 + switches.size())
+		_add_puzzle_label(sw, plate_id, board.SWITCH_COLORS[switches.size() % board.SWITCH_COLORS.size()], 8)
 		switches.append(sw)
 
 	# Tao cua va lien ket voi cong tac.
@@ -370,7 +372,28 @@ func _create_switches_and_doors() -> void:
 				switches[index]
 			)
 
+		var circuit := PackedStringArray()
+		for index: int in indices:
+			circuit.append(String.chr(65 + index))
+		_add_puzzle_label(door, "+".join(circuit), Color("#dce9ff"))
 		doors.append(door)
+
+
+func _add_puzzle_label(object: Node2D, text: String, color: Color, offset_x: int = -16) -> void:
+	var label := Label.new()
+	label.text = text
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.z_index = 6
+	label.position = Vector2(offset_x, 10)
+	label.size = Vector2(16 if offset_x > 0 else 32, 14)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_override("font", LAB_THEME.get_font("font", "Heading"))
+	label.add_theme_font_size_override("font_size", 11)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_outline_color", Color("#090f1b"))
+	label.add_theme_constant_override("outline_size", 3)
+	object.add_child(label)
 
 
 # ============================================================
@@ -380,6 +403,7 @@ func _create_switches_and_doors() -> void:
 func _clear_echoes() -> void:
 	for echo in echoes:
 		if is_instance_valid(echo):
+			echo.hide()
 			echo.queue_free()
 
 	echoes.clear()
@@ -411,7 +435,7 @@ func _spawn_echoes() -> void:
 
 		if i == 1:
 			tint = Color(
-				0.8, 0.4, 1.0, 0.65
+				1.28, 0.66, 1.35, 0.72
 			)
 
 		echo.setup_echo(
@@ -426,6 +450,7 @@ func _spawn_echoes() -> void:
 func _reset_world_state() -> void:
 	# Xoa Echo cu.
 	_clear_echoes()
+	board.reset_trails()
 
 	# Reset switch va door.
 	for sw in switches:
@@ -456,6 +481,7 @@ func _on_run_failed() -> void:
 	turn_manager.input_locked = true
 
 	hud.set_input_locked(true)
+	hud.show_run_failed()
 
 	print(
 		"RUN FAILED: Da het 3 Time Loops"
@@ -685,6 +711,7 @@ func _on_tick_actions_requested(
 func _on_tick_finished(
 	_tick_number: int
 ) -> void:
+	board.record_trails(echoes)
 	_update_hud()
 
 

@@ -1,279 +1,402 @@
 [gd_scene format=3 uid="uid://bopc2s1tttpqo"]
 
-[ext_resource type="Script" uid="uid://j02mkx3j3648" path="res://scripts/ui/hud.gd" id="1_0mwgc"]
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="script"]
+[ext_resource type="Theme" path="res://scenes/ui/lab_theme.tres" id="theme"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lab_controls.png" id="icons"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kicr4"]
-bg_color = Color(0.09019608, 0.19607843, 0.3019608, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.16078432, 0.8509804, 0.9098039, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+[sub_resource type="AtlasTexture" id="Up"]
+atlas = ExtResource("icons")
+region = Rect2(0, 0, 32, 32)
+filter_clip = true
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mj13f"]
-bg_color = Color(0.08627451, 0.5411765, 0.60784316, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.4392157, 0.9607843, 1, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+[sub_resource type="AtlasTexture" id="Down"]
+atlas = ExtResource("icons")
+region = Rect2(32, 0, 32, 32)
+filter_clip = true
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h022r"]
-bg_color = Color(0.15686275, 0.34117648, 0.5019608, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-corner_detail = 11
+[sub_resource type="AtlasTexture" id="Left"]
+atlas = ExtResource("icons")
+region = Rect2(64, 0, 32, 32)
+filter_clip = true
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bo48s"]
-bg_color = Color(0.1882353, 0.22745098, 0.27450982, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.4, 0.45490196, 0.50980395, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-corner_detail = 11
+[sub_resource type="AtlasTexture" id="Right"]
+atlas = ExtResource("icons")
+region = Rect2(96, 0, 32, 32)
+filter_clip = true
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_136eg"]
-bg_color = Color(0.09019608, 0.41960785, 0.5137255, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+[sub_resource type="AtlasTexture" id="Wait"]
+atlas = ExtResource("icons")
+region = Rect2(128, 0, 32, 32)
+filter_clip = true
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gss2c"]
-bg_color = Color(0.52156866, 0.23137255, 0.2901961, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+[sub_resource type="AtlasTexture" id="EndLoop"]
+atlas = ExtResource("icons")
+region = Rect2(160, 0, 32, 32)
+filter_clip = true
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0mwgc"]
-bg_color = Color(0.72832644, 0.36055812, 0.25064287, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.4392157, 0.9607843, 1, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+[sub_resource type="AtlasTexture" id="Restart"]
+atlas = ExtResource("icons")
+region = Rect2(192, 0, 32, 32)
+filter_clip = true
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hqnrr"]
-bg_color = Color(0.48744416, 0.25410607, 0.16508183, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-corner_detail = 11
+[sub_resource type="AtlasTexture" id="Echo"]
+atlas = ExtResource("icons")
+region = Rect2(256, 0, 32, 32)
+filter_clip = true
 
 [node name="HUD" type="CanvasLayer" unique_id=985695084]
-script = ExtResource("1_0mwgc")
+script = ExtResource("script")
 
 [node name="HUDRoot" type="Control" parent="." unique_id=135147441]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+mouse_filter = 2
+theme = ExtResource("theme")
 
 [node name="TopBar" type="Panel" parent="HUDRoot" unique_id=267420049]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 75.0
-metadata/_edit_use_anchors_ = true
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 0
+offset_left = 14.0
+offset_top = 10.0
+offset_right = -14.0
+offset_bottom = 72.0
+mouse_filter = 2
 
-[node name="LevelLabel" type="Label" parent="HUDRoot/TopBar" unique_id=1061217851]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.063
-anchor_right = 0.063
-offset_top = 20.0
-offset_right = 200.0
+[node name="LoopMark" type="TextureRect" parent="HUDRoot/TopBar"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = 54.0
+offset_bottom = 54.0
+mouse_filter = 2
+texture = SubResource("EndLoop")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(0.4745, 0.8471, 1.0000, 1)
+
+[node name="GameName" type="Label" parent="HUDRoot/TopBar"]
+theme_type_variation = &"Heading"
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 56.0
+offset_top = 4.0
+offset_right = 222.0
 offset_bottom = 59.0
-theme_override_colors/font_color = Color(0.21960784, 0.8509804, 0.9019608, 1)
-theme_override_font_sizes/font_size = 28
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.8824, 0.9451, 1.0000, 1)
+theme_override_font_sizes/font_size = 27
+text = "ECHO LOOP"
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="TitleDivider" type="ColorRect" parent="HUDRoot/TopBar"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 220.0
+offset_top = 12.0
+offset_right = 222.0
+offset_bottom = 50.0
+mouse_filter = 2
+color = Color(0.1922, 0.3294, 0.4667, 1)
+
+[node name="LevelLabel" type="Label" parent="HUDRoot/TopBar"]
+theme_type_variation = &"Heading"
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 244.0
+offset_top = 5.0
+offset_right = 683.0
+offset_bottom = 35.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.8157, 0.9137, 1.0000, 1)
+theme_override_font_sizes/font_size = 24
 text = "LEVEL 01"
+horizontal_alignment = 0
+vertical_alignment = 1
 
-[node name="TickLabel" type="Label" parent="HUDRoot/TopBar" unique_id=628400437]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.313
-anchor_right = 0.313
-offset_top = 20.0
-offset_right = 200.0
-offset_bottom = 59.0
-theme_override_colors/font_color = Color(0.21960784, 0.8509804, 0.9019608, 1)
-theme_override_font_sizes/font_size = 28
+[node name="Objective" type="Label" parent="HUDRoot/TopBar"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 245.0
+offset_top = 35.0
+offset_right = 685.0
+offset_bottom = 58.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.6275, 0.7255, 0.8275, 1)
+theme_override_font_sizes/font_size = 16
+text = "Record a route to the pressure plate."
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="TickLabelPlate" type="Panel" parent="HUDRoot/TopBar"]
+anchor_left = 1
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 0
+offset_left = -559.0
+offset_top = 8.0
+offset_right = -421.0
+offset_bottom = 54.0
+mouse_filter = 2
+
+[node name="TickLabel" type="Label" parent="HUDRoot/TopBar"]
+theme_type_variation = &"Heading"
+anchor_left = 1
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 0
+offset_left = -559.0
+offset_top = 8.0
+offset_right = -421.0
+offset_bottom = 54.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4706, 0.9137, 1.0000, 1)
+theme_override_font_sizes/font_size = 21
 text = "TICK: 0/12"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="LoopLabel" type="Label" parent="HUDRoot/TopBar" unique_id=684208435]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.563
-anchor_right = 0.563
-offset_top = 20.0
-offset_right = 200.0
-offset_bottom = 59.0
-theme_override_colors/font_color = Color(0.21960784, 0.8509804, 0.9019608, 1)
-theme_override_font_sizes/font_size = 28
+[node name="LoopLabelPlate" type="Panel" parent="HUDRoot/TopBar"]
+anchor_left = 1
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 0
+offset_left = -411.0
+offset_top = 8.0
+offset_right = -284.0
+offset_bottom = 54.0
+mouse_filter = 2
+
+[node name="LoopLabel" type="Label" parent="HUDRoot/TopBar"]
+theme_type_variation = &"Heading"
+anchor_left = 1
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 0
+offset_left = -411.0
+offset_top = 8.0
+offset_right = -284.0
+offset_bottom = 54.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7529, 0.8314, 0.9294, 1)
+theme_override_font_sizes/font_size = 21
 text = "LOOP: 1"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="EchoLabel" type="Label" parent="HUDRoot/TopBar" unique_id=1491986720]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.813
-anchor_right = 0.813
-offset_top = 20.0
-offset_right = 200.0
-offset_bottom = 59.0
-theme_override_colors/font_color = Color(0.21960784, 0.8509804, 0.9019608, 1)
-theme_override_font_sizes/font_size = 28
-text = "ECHO: 0"
+[node name="EchoLabelPlate" type="Panel" parent="HUDRoot/TopBar"]
+anchor_left = 1
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 0
+offset_left = -271.0
+offset_top = 8.0
+offset_right = -95.0
+offset_bottom = 54.0
+mouse_filter = 2
+
+[node name="EchoLabel" type="Label" parent="HUDRoot/TopBar"]
+theme_type_variation = &"Heading"
+anchor_left = 1
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 0
+offset_left = -227.0
+offset_top = 8.0
+offset_right = -95.0
+offset_bottom = 54.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7137, 0.6549, 1.0000, 1)
+theme_override_font_sizes/font_size = 21
+text = "ECHO: 0/2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EchoIcon" type="TextureRect" parent="HUDRoot/TopBar"]
+anchor_left = 1
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 0
+offset_left = -263.0
+offset_top = 13.0
+offset_right = -232.0
+offset_bottom = 49.0
+mouse_filter = 2
+texture = SubResource("Echo")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(0.7765, 0.6941, 1.0000, 1)
 
 [node name="ControlsArea" type="Control" parent="HUDRoot" unique_id=1906256270]
-layout_mode = 1
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -250.0
+anchor_left = 0
+anchor_top = 1
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0.0
+offset_top = -186.0
+offset_right = 0.0
+offset_bottom = 0.0
+mouse_filter = 2
 
-[node name="UpButton" type="Button" parent="HUDRoot/ControlsArea" unique_id=1164952988]
-layout_mode = 1
-anchors_preset = -1
-offset_left = 153.0
-offset_top = 40.0
-offset_right = 243.0
-offset_bottom = 120.0
-theme_override_colors/font_disabled_color = Color(0.5372549, 0.58431375, 0.6392157, 1)
-theme_override_font_sizes/font_size = 36
-theme_override_styles/normal = SubResource("StyleBoxFlat_kicr4")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_mj13f")
-theme_override_styles/hover = SubResource("StyleBoxFlat_h022r")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_bo48s")
-text = "↑"
+[node name="UpButton" type="Button" parent="HUDRoot/ControlsArea"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 91.0
+offset_top = 0.0
+offset_right = 155.0
+offset_bottom = 62.0
+mouse_default_cursor_shape = 2
+icon = SubResource("Up")
+icon_alignment = 1
+tooltip_text = "UP"
+text = ""
 
-[node name="LeftButton" type="Button" parent="HUDRoot/ControlsArea" unique_id=168350902]
-layout_mode = 0
-offset_left = 53.0
-offset_top = 130.0
-offset_right = 143.0
-offset_bottom = 210.0
-theme_override_colors/font_disabled_color = Color(0.5372549, 0.58431375, 0.6392157, 1)
-theme_override_font_sizes/font_size = 36
-theme_override_styles/normal = SubResource("StyleBoxFlat_kicr4")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_mj13f")
-theme_override_styles/hover = SubResource("StyleBoxFlat_h022r")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_bo48s")
-text = "←"
+[node name="LeftButton" type="Button" parent="HUDRoot/ControlsArea"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 22.0
+offset_top = 56.0
+offset_right = 86.0
+offset_bottom = 118.0
+mouse_default_cursor_shape = 2
+icon = SubResource("Left")
+icon_alignment = 1
+tooltip_text = "LEFT"
+text = ""
 
-[node name="DownButton" type="Button" parent="HUDRoot/ControlsArea" unique_id=1677662452]
-layout_mode = 0
-offset_left = 153.0
-offset_top = 130.0
-offset_right = 243.0
-offset_bottom = 210.0
-theme_override_colors/font_disabled_color = Color(0.5372549, 0.58431375, 0.6392157, 1)
-theme_override_font_sizes/font_size = 36
-theme_override_styles/normal = SubResource("StyleBoxFlat_kicr4")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_mj13f")
-theme_override_styles/hover = SubResource("StyleBoxFlat_h022r")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_bo48s")
-text = "↓"
+[node name="RightButton" type="Button" parent="HUDRoot/ControlsArea"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 160.0
+offset_top = 56.0
+offset_right = 224.0
+offset_bottom = 118.0
+mouse_default_cursor_shape = 2
+icon = SubResource("Right")
+icon_alignment = 1
+tooltip_text = "RIGHT"
+text = ""
 
-[node name="RightButton" type="Button" parent="HUDRoot/ControlsArea" unique_id=742888781]
-layout_mode = 0
-offset_left = 253.0
-offset_top = 130.0
-offset_right = 343.0
-offset_bottom = 210.0
-theme_override_colors/font_disabled_color = Color(0.5372549, 0.58431375, 0.6392157, 1)
-theme_override_font_sizes/font_size = 36
-theme_override_styles/normal = SubResource("StyleBoxFlat_kicr4")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_mj13f")
-theme_override_styles/hover = SubResource("StyleBoxFlat_h022r")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_bo48s")
-text = "→"
+[node name="DownButton" type="Button" parent="HUDRoot/ControlsArea"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 91.0
+offset_top = 112.0
+offset_right = 155.0
+offset_bottom = 174.0
+mouse_default_cursor_shape = 2
+icon = SubResource("Down")
+icon_alignment = 1
+tooltip_text = "DOWN"
+text = ""
 
-[node name="WaitButton" type="Button" parent="HUDRoot/ControlsArea" unique_id=1450145954]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -240.0
-offset_top = 10.0
-offset_right = -70.0
-offset_bottom = 70.0
-theme_override_colors/font_disabled_color = Color(0.5372549, 0.58431375, 0.6392157, 1)
-theme_override_font_sizes/font_size = 22
-theme_override_styles/normal = SubResource("StyleBoxFlat_136eg")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_mj13f")
-theme_override_styles/hover = SubResource("StyleBoxFlat_h022r")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_bo48s")
+[node name="WaitButton" type="Button" parent="HUDRoot/ControlsArea"]
+anchor_left = 1
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 0
+offset_left = -246.0
+offset_top = 56.0
+offset_right = -173.0
+offset_bottom = 140.0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"ActionButton"
+theme_override_font_sizes/font_size = 14
 text = "WAIT"
 
-[node name="EndLoopButton" type="Button" parent="HUDRoot/ControlsArea" unique_id=1710771756]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -240.0
-offset_top = 80.0
-offset_right = -70.0
-offset_bottom = 140.0
-theme_override_colors/font_disabled_color = Color(0.5372549, 0.58431375, 0.6392157, 1)
-theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("StyleBoxFlat_136eg")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_mj13f")
-theme_override_styles/hover = SubResource("StyleBoxFlat_h022r")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_bo48s")
-text = "ENDLOOP"
+[node name="Symbol" type="TextureRect" parent="HUDRoot/ControlsArea/WaitButton"]
+anchor_left = 0.5
+anchor_top = 0
+anchor_right = 0.5
+anchor_bottom = 0
+offset_left = -17.0
+offset_top = 8.0
+offset_right = 17.0
+offset_bottom = 42.0
+mouse_filter = 2
+texture = SubResource("Wait")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="RestartButton" type="Button" parent="HUDRoot/ControlsArea" unique_id=461591408]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -240.0
-offset_top = 150.0
-offset_right = -70.0
-offset_bottom = 210.0
-theme_override_colors/font_disabled_color = Color(0.5372549, 0.58431375, 0.6392157, 1)
-theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("StyleBoxFlat_gss2c")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_0mwgc")
-theme_override_styles/hover = SubResource("StyleBoxFlat_hqnrr")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_bo48s")
+[node name="EndLoopButton" type="Button" parent="HUDRoot/ControlsArea"]
+anchor_left = 1
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 0
+offset_left = -166.0
+offset_top = 56.0
+offset_right = -88.0
+offset_bottom = 140.0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"ActionButton"
+theme_override_font_sizes/font_size = 14
+text = "END LOOP"
+
+[node name="Symbol" type="TextureRect" parent="HUDRoot/ControlsArea/EndLoopButton"]
+anchor_left = 0.5
+anchor_top = 0
+anchor_right = 0.5
+anchor_bottom = 0
+offset_left = -17.0
+offset_top = 8.0
+offset_right = 17.0
+offset_bottom = 42.0
+mouse_filter = 2
+texture = SubResource("EndLoop")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RestartButton" type="Button" parent="HUDRoot/ControlsArea"]
+anchor_left = 1
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 0
+offset_left = -81.0
+offset_top = 56.0
+offset_right = -14.0
+offset_bottom = 140.0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"ActionButton"
+theme_override_font_sizes/font_size = 14
 text = "RESTART"
+
+[node name="Symbol" type="TextureRect" parent="HUDRoot/ControlsArea/RestartButton"]
+anchor_left = 0.5
+anchor_top = 0
+anchor_right = 0.5
+anchor_bottom = 0
+offset_left = -17.0
+offset_top = 8.0
+offset_right = 17.0
+offset_bottom = 42.0
+mouse_filter = 2
+texture = SubResource("Restart")
+expand_mode = 1
+stretch_mode = 5

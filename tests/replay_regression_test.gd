@@ -2,9 +2,9 @@ extends Node2D
 const TIME_LOOP_SCRIPT: Script = preload("res://scripts/timeloop/time_loop_manager.gd")
 const TURN_MANAGER_SCRIPT: Script = preload("res://scripts/core/turn_manager.gd")
 const PLAYER_SCRIPT: Script = preload("res://scripts/player/player_controller.gd")
-const SWITCH_SCRIPT: Script = preload("res://scripts/puzzle/pressure_switch.gd")
-const DOOR_SCRIPT: Script = preload("res://scripts/puzzle/door.gd")
-const EXIT_SCRIPT: Script = preload("res://scripts/puzzle/exit_portal.gd")
+const SWITCH_SCENE := preload("res://scenes/puzzle/pressure_switch.tscn")
+const DOOR_SCENE := preload("res://scenes/puzzle/door.tscn")
+const EXIT_SCENE := preload("res://scenes/puzzle/exit_portal.tscn")
 
 const ECHO_SCENE_PATH: String = "res://scenes/player/echo.tscn"
 
@@ -228,22 +228,20 @@ func _on_tick_actions_requested(
 
 
 func _build_world_for_current_histories() -> void:
-	_player = _spawn_script_node(PLAYER_SCRIPT, "FixturePlayer", false)
+	_player = _add_world_node(PLAYER_SCRIPT.new(), "FixturePlayer")
 	_player.call("reset_position", FIXTURE_START)
 
-	_switch = _spawn_script_node(SWITCH_SCRIPT, "FixtureSwitch", true)
+	_switch = _add_world_node(SWITCH_SCENE.instantiate(), "FixtureSwitch")
 	_switch.set("grid_position", FIXTURE_SWITCH)
 
-	var door_instance: Node = DOOR_SCRIPT.new() as Node
-	door_instance.name = "FixtureDoor"
-	door_instance.add_child(Sprite2D.new())
+	var door_instance := DOOR_SCENE.instantiate()
 	door_instance.set("grid_position", FIXTURE_DOOR)
 	var switch_links: Array[PressureSwitch] = []
 	switch_links.append(_switch as PressureSwitch)
 	door_instance.set("linked_switches", switch_links)
-	_door = _add_world_node(door_instance)
+	_door = _add_world_node(door_instance, "FixtureDoor")
 
-	_exit = _spawn_script_node(EXIT_SCRIPT, "FixtureExit", true)
+	_exit = _add_world_node(EXIT_SCENE.instantiate(), "FixtureExit")
 	_exit.set("grid_position", FIXTURE_EXIT)
 
 	_echo_actors.clear()
@@ -260,8 +258,7 @@ func _build_world_for_current_histories() -> void:
 		var echo_actor: Node
 		if _uses_real_echo_controller and echo_scene != null:
 			echo_actor = echo_scene.instantiate()
-			echo_actor.name = "FixtureEcho%d" % [echo_index + 1]
-			_add_world_node(echo_actor)
+			_add_world_node(echo_actor, "FixtureEcho%d" % [echo_index + 1])
 			echo_actor.call(
 				"setup_echo",
 				FIXTURE_START,
@@ -269,7 +266,7 @@ func _build_world_for_current_histories() -> void:
 				Color(0.25, 0.75, 1.0, 0.7) if echo_index == 0 else Color(0.65, 0.4, 1.0, 0.5)
 			)
 		else:
-			echo_actor = _spawn_script_node(PLAYER_SCRIPT, "FixtureEcho%d" % [echo_index + 1], false)
+			echo_actor = _add_world_node(PLAYER_SCRIPT.new(), "FixtureEcho%d" % [echo_index + 1])
 			echo_actor.call("reset_position", FIXTURE_START)
 		_echo_actors.append(echo_actor)
 
@@ -335,15 +332,8 @@ func _on_aux_run_failed() -> void:
 	_aux_run_failed = true
 
 
-func _spawn_script_node(script: Script, node_name: String, add_sprite: bool) -> Node:
-	var instance: Node = script.new() as Node
+func _add_world_node(instance: Node, node_name: String) -> Node:
 	instance.name = node_name
-	if add_sprite:
-		instance.add_child(Sprite2D.new())
-	return _add_world_node(instance)
-
-
-func _add_world_node(instance: Node) -> Node:
 	add_child(instance)
 	_world_nodes.append(instance)
 	return instance

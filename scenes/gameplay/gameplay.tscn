@@ -5,101 +5,56 @@
 [ext_resource type="PackedScene" uid="uid://bopc2s1tttpqo" path="res://scenes/ui/hud.tscn" id="3_2p25t"]
 [ext_resource type="PackedScene" uid="uid://drrakppaejgj7" path="res://scenes/ui/level_complete.tscn" id="4_m3hu3"]
 [ext_resource type="PackedScene" uid="uid://dem4pnc5oo4hk" path="res://scenes/ui/pause_menu.tscn" id="5_q64rj"]
+[ext_resource type="Script" path="res://scripts/core/lab_board.gd" id="board"]
+[ext_resource type="Texture2D" path="res://assets/sprites/environment/lab_background.png" id="bg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lab_controls.png" id="icons"]
+[ext_resource type="Theme" path="res://scenes/ui/lab_theme.tres" id="theme"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_elxb5"]
-content_margin_left = 16.0
-content_margin_top = 8.0
-content_margin_right = 16.0
-content_margin_bottom = 8.0
-bg_color = Color(0.1254902, 0.22352941, 0.3019608, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.13333334, 0.827451, 0.93333334, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6bivr"]
-bg_color = Color(0.03137255, 0.2, 0.26666668, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2o76q"]
-bg_color = Color(0.05490196, 0.45490196, 0.5647059, 1)
-border_color = Color(0.40392157, 0.9098039, 0.9764706, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+[sub_resource type="AtlasTexture" id="Pause"]
+atlas = ExtResource("icons")
+region = Rect2(224, 0, 32, 32)
+filter_clip = true
 
 [node name="Gameplay" type="Node2D" unique_id=1452477168]
 script = ExtResource("1_elxb5")
 
-[node name="LegacyHUD" type="CanvasLayer" parent="." unique_id=254047554]
-visible = false
+[node name="Backdrop" type="CanvasLayer" parent="."]
+layer = -1
 
-[node name="HUDRoot" type="Control" parent="LegacyHUD" unique_id=1658827081]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Background" type="ColorRect" parent="LegacyHUD/HUDRoot" unique_id=76273517]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.0627451, 0.10980392, 0.16862746, 1)
-
-[node name="CenterContainer" type="CenterContainer" parent="LegacyHUD/HUDRoot" unique_id=78838431]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="GameContent" type="VBoxContainer" parent="LegacyHUD/HUDRoot/CenterContainer" unique_id=687037404]
-layout_mode = 2
-
-[node name="GameLabel" type="Label" parent="LegacyHUD/HUDRoot/CenterContainer/GameContent" unique_id=364175735]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.40392157, 0.9098039, 0.9764706, 1)
-theme_override_font_sizes/font_size = 40
-text = "ECHO LOOP - GAMEPLAY TEST"
-horizontal_alignment = 1
-
-[node name="BackButton" type="Button" parent="LegacyHUD/HUDRoot/CenterContainer/GameContent" unique_id=386851851]
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_elxb5")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_6bivr")
-theme_override_styles/hover = SubResource("StyleBoxFlat_2o76q")
-text = "BACK TO MENU"
+[node name="Lab" type="TextureRect" parent="Backdrop"]
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+mouse_filter = 2
+texture = ExtResource("bg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="LevelRoot" type="Node2D" parent="." unique_id=521491810]
-position = Vector2(400, 200)
+texture_filter = 1
 
 [node name="Walls" type="Node2D" parent="LevelRoot" unique_id=880862172]
+script = ExtResource("board")
 
-[node name="InteractiveObjects" type="Node2D" parent="LevelRoot" unique_id=373563781]
+[node name="InteractiveObjects" type="Node2D" parent="LevelRoot" unique_id=173563781]
+
 
 [node name="Player" parent="LevelRoot" unique_id=1364354151 instance=ExtResource("2_x0t60")]
+z_index = 4
 
 [node name="EchoContainer" type="Node2D" parent="LevelRoot" unique_id=941487180]
+z_index = 3
 
 [node name="GameCamera" type="Camera2D" parent="." unique_id=1657914101]
-position = Vector2(640, 360)
+anchor_mode = 0
 
 [node name="HUD" parent="." unique_id=985695084 instance=ExtResource("3_2p25t")]
+
 
 [node name="ResultLayer" type="CanvasLayer" parent="." unique_id=1485569698]
 layer = 2
@@ -110,16 +65,21 @@ visible = false
 [node name="PauseLayer" type="CanvasLayer" parent="." unique_id=1456918520]
 layer = 3
 
-[node name="PauseButton" type="Button" parent="PauseLayer" unique_id=938206738]
-anchors_preset = -1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -150.0
-offset_top = 80.0
+[node name="PauseButton" type="Button" parent="PauseLayer"]
+anchor_left = 1
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 0
+offset_left = -80.0
+offset_top = 15.0
 offset_right = -20.0
-offset_bottom = 130.0
-grow_horizontal = 0
-text = "PAUSE"
+offset_bottom = 66.0
+mouse_default_cursor_shape = 2
+theme = ExtResource("theme")
+icon = SubResource("Pause")
+icon_alignment = 1
+tooltip_text = "PAUSE"
+text = ""
 
 [node name="PauseMenu" parent="PauseLayer" unique_id=603466757 instance=ExtResource("5_q64rj")]
 visible = false

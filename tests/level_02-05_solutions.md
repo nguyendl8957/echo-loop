@@ -1,5 +1,7 @@
 # Level 02–05 — Solution Record & Validation Proofs (S04-TV3)
 
+Historical Sprint 04 record. See [Level Design V2](level_design_v2.md) for the current levels.
+
 **Issue:** #23  
 **Owner:** TV3 (Gia Huy)  
 **Source baseline:** `main` (commit `58aa072` - tích hợp đầy đủ Sprint 03)  
